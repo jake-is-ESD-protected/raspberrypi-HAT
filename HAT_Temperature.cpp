@@ -18,7 +18,6 @@ HAT_temp::HAT_temp(){
    //wiringPi setup:
    int myWPi = wiringPiSetup();
    int mySPI = wiringPiSPISetupMode(CE_CHANNEL, SPI_CLOCK, SPI_MODE);
-
    //GPIO-Setup:
    ///TODO: add two LEDs when new HAT is ready
   	pinMode(LED_RED_PIN, OUTPUT);
@@ -29,6 +28,8 @@ HAT_temp::HAT_temp(){
 	digitalWrite (PWRON_PIN, GPIO_HIGH);
 	digitalWrite (RESET_N_PIN, GPIO_HIGH);
 
+   HAT_error = noError;
+   
    //wiringPi error check
    if(mySPI < 0){
       printf("wiringPi-setup failed: wiringPi-fd: %d, SPI-fd: %d\n", myWPi, mySPI);
@@ -36,12 +37,17 @@ HAT_temp::HAT_temp(){
       return;
    }
 
+   //reset sensor
+   resetSensor();
+
    //sensor error check
    if(!pokeSensor(CONFIG_REG_R_COMMAND)){
       printf("warning: Can't reach sensor\n");
       HAT_error = sensor_error_unreachable;
       return;
    }
+
+
 
    //happy to be ready!
    printf("***************RaspberryPi temperature-HAT by Stefan & Jakob is ready!***************\n");
@@ -86,9 +92,10 @@ bool HAT_temp::pokeSensor(uint8_t read_command){
    if(isClean() != 1)return false;
 
    uint8_t dbuf[2] = {0, 0};
-   dbuf[0] = read_command;
+   dbuf[0] = CONFIG_REG_R_COMMAND;
 
    delay(500);
+   printf("DEBUG\n");
 
    wiringPiSPIDataRW(CE_CHANNEL, dbuf, 2);
    if((dbuf[0] == 0) && (dbuf[1] == 0)){
@@ -110,6 +117,7 @@ bool HAT_temp::resetSensor(void){
 
    unsigned char reset[4] = {RESET_BYTE, RESET_BYTE, RESET_BYTE, RESET_BYTE};
    wiringPiSPIDataRW(CE_CHANNEL, reset, 4);
+   delay(500);
    return true;
 }
 
