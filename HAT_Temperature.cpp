@@ -25,10 +25,17 @@ HAT_temp::HAT_temp(){
 	pinMode(RESET_N_PIN, OUTPUT);
    pinMode(BUTTON_PIN, INPUT);
 	digitalWrite (LED_RED_PIN, GPIO_LOW);
-	digitalWrite (PWRON_PIN, GPIO_HIGH);
-	digitalWrite (RESET_N_PIN, GPIO_HIGH);
+   //digitalWrite (RESET_N_PIN, GPIO_HIGH);
+	digitalWrite (PWRON_PIN, GPIO_LOW);
+   delay(2000);
+   digitalWrite(PWRON_PIN, GPIO_HIGH);
+   delay(2000);
+   digitalWrite (PWRON_PIN, GPIO_LOW);
+	
 
    HAT_error = noError;
+
+   printf("Starting THERMO-HAT...\n\n");
    
    //wiringPi error check
    if(mySPI < 0){
@@ -47,14 +54,17 @@ HAT_temp::HAT_temp(){
       return;
    }
 
-
+   #ifdef USE_PROTOBOARD
+      printf("\nInfo: config set to PROTOBOARD\n");
+   #endif
 
    //happy to be ready!
-   printf("***************RaspberryPi temperature-HAT by Stefan & Jakob is ready!***************\n");
+   printf("\n\n***************RaspberryPi temperature-HAT by Stefan & Jakob is ready!***************\n\n");
+
    for(int i = 0; i < 5; i++){
-      digitalWrite(LED_RED_PIN, LOW);
+      digitalWrite(LED_RED_PIN, GPIO_HIGH);
       delay(100);
-      digitalWrite(LED_RED_PIN, HIGH);
+      digitalWrite(LED_RED_PIN, GPIO_LOW);
       delay(100);
    }
 }
@@ -78,7 +88,7 @@ bool HAT_temp::printTempSamples(int n){
 
       uint16_t rawtemp = ((uint16_t)(dbuf[1]) << 8) | dbuf[2];
       double temp = ((double)(rawtemp)) / 128 - ROUGH_TEMP_OFFS;
-      printf("\ncalculated temperature %d: %lf\n\n", i, temp);
+      printf("calculated temperature %d: %lf\n", i, temp);
       delay(500);
    }
    return true;
@@ -91,21 +101,38 @@ bool HAT_temp::pokeSensor(uint8_t read_command){
 
    if(isClean() != 1)return false;
 
-   uint8_t dbuf[2] = {0, 0};
-   dbuf[0] = CONFIG_REG_R_COMMAND;
+   printf("Sensor stats:\n\n");
+   unsigned char dbuf[2] = {0, 0};
+
+   //request status register
+   dbuf[0] = STAT_REG_R_COMMAND;
+   dbuf[1] = 0;
+   wiringPiSPIDataRW(CE_CHANNEL, dbuf, 2);
+   printf("\tstatus register 1st byte: %d\n", dbuf[0]);
+   printf("\tstatus register 2nd byte: %d\n", dbuf[1]);
 
    delay(500);
-   printf("DEBUG\n");
 
+   //request ID register
+   dbuf[0] = ID_REG_R_COMMAND;
+   dbuf[1] = 0;
    wiringPiSPIDataRW(CE_CHANNEL, dbuf, 2);
-   if((dbuf[0] == 0) && (dbuf[1] == 0)){
-      printf("warning: SPI-return empty!\n");
-      return false;
-   }
-   printf("status register 1st byte: %d\n", dbuf[0]);
-   printf("status register 2nd byte: %d\n", dbuf[1]);
-   
+   printf("\tID register 1st byte: %d\n", dbuf[0]);
+   printf("\tID register 2nd byte: %d\n", dbuf[1]);
+
+   delay(500);
+
+   //request config register
+   dbuf[0] = CONFIG_REG_R_COMMAND;
+   dbuf[1] = 0;
+   wiringPiSPIDataRW(CE_CHANNEL, dbuf, 2);
+   printf("\tconfig register 1st byte: %d\n", dbuf[0]);
+   printf("\tconfig register 2nd byte: %d\n", dbuf[1]);
+
+   delay(500);
+
    return true;
+
 }
 
 /*factory-reset sensor
@@ -162,6 +189,8 @@ uint8_t HAT_temp::isClean(void){
    }
    return HAT_error;
 }
+
+
 
 
 

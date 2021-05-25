@@ -46,6 +46,7 @@ private:
 
 public:
     sara(void);
+    ~sara();
     bool pokeSARA(const char* command);
 };
 

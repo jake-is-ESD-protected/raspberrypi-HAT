@@ -17,12 +17,12 @@ bool hat_callSARA(void){
    int mySerial = serialOpen(PORT, BAUDRATE);
    printf("UART-File descriptor: %d\n\n", mySerial);
    if(mySerial < 0){
-   printf("UART-setup failed\n");
-   return false;
+      printf("UART-setup failed\n");
+      return false;
    }
 
    printf("UART-communication:\n\n");
-   const char bufTransmit[] = "AT&V\r";
+   const char bufTransmit[] = "AT+CGMI\r";
    serialPrintf(mySerial, bufTransmit);
    printf("sent: %s\n", bufTransmit);
 
@@ -34,6 +34,7 @@ bool hat_callSARA(void){
 	int receiveLen = serialDataAvail(mySerial);
    if (receiveLen == 0) {
 		printf("Error: Empty string!\n");
+      return false;
 	}
 	else if(receiveLen < 0){
 		printf("Error: Unable to receive!\n");
@@ -46,7 +47,7 @@ bool hat_callSARA(void){
       printf("\n");
       serialFlush(mySerial);
    }
-   delay(1000);
+   //delay(1000);
    serialClose(mySerial);
 
    return true;
@@ -76,7 +77,17 @@ int main(void){
       delay(100);
    }
 
-   hat_callSARA();
+   int no = 0;
+   int yes = 0;
+   for(int i = 0; i < 20; i++){
+      if(hat_callSARA()){
+         yes++;
+      }
+      else{
+         no++;
+      }
+   }
+   printf("yes: %d, no: %d\n", yes, no);
    return 0;
 }
 

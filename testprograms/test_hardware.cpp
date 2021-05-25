@@ -13,8 +13,6 @@
 #include "/home/pi/workspace/TemperatureHAT/raspberrypi-temperatureHAT/HAT_Temperature.h"
 #include "/home/pi/workspace/TemperatureHAT/raspberrypi-temperatureHAT/HAT_Temperature.cpp"
 
-#include <stdio.h>
-
 int main(void){
 
     HAT_temp myHAT;

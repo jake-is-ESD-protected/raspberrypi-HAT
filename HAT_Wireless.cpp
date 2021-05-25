@@ -14,6 +14,7 @@
    -opens serial
 */
 sara::sara(void){
+   wireless_error = noError;
     serial = serialOpen(PORT, BAUDRATE);
 
    //uart error check
@@ -22,12 +23,13 @@ sara::sara(void){
       wireless_error = error_uart;
       return;
    }
+   printf("clean sara-init\n");
 }
 
 /*destruct sara-object
    -closes serial
 */
-sara::~sara(void){
+sara::~sara(){
    serialClose(serial);
    wireless_error = noInit;
 }
@@ -42,7 +44,7 @@ bool sara::pokeSARA(const char* message){
    printf("command sent: %s\n", message);
 
    //wait, otherwise read call is too fast
-   delay(100);
+   delay(2000);
    
    //RX:
 	unsigned char bufReceive[500];
@@ -113,4 +115,5 @@ telegramBot::telegramBot(std::string token){
 */
 bool telegramBot::chatTemp(double temp){
 
+   return true;
 }
