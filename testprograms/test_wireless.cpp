@@ -20,7 +20,7 @@ int main(void){
 	HAT_temp hardware;
     //telegramBot bot(BOT_TOKEN);
 	sara mysara;
-	mysara.pokeSARA("AT+CSCS\r");
+	mysara.pokeSARA("AT&V\r");
 
     return 0;
 }

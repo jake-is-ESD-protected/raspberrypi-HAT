@@ -18,14 +18,19 @@ HAT_temp::HAT_temp(){
    //wiringPi setup:
    int myWPi = wiringPiSetup();
    int mySPI = wiringPiSPISetupMode(CE_CHANNEL, SPI_CLOCK, SPI_MODE);
+
    //GPIO-Setup:
-   ///TODO: add two LEDs when new HAT is ready
+   pinMode(LED_BLUE_PIN, OUTPUT);
+   pinMode(LED_GREEN_PIN, OUTPUT);
   	pinMode(LED_RED_PIN, OUTPUT);
 	pinMode(PWRON_PIN, OUTPUT);
 	pinMode(RESET_N_PIN, OUTPUT);
    pinMode(BUTTON_PIN, INPUT);
-	digitalWrite (LED_RED_PIN, GPIO_LOW);
-   //digitalWrite (RESET_N_PIN, GPIO_HIGH);
+
+	digitalWrite (LED_RED_PIN, GPIO_HIGH);
+   digitalWrite (LED_GREEN_PIN, GPIO_LOW);
+   digitalWrite (LED_BLUE_PIN, GPIO_LOW);
+   printf("Starting THERMO-HAT...\n\n");
 	digitalWrite (PWRON_PIN, GPIO_LOW);
    delay(2000);
    digitalWrite(PWRON_PIN, GPIO_HIGH);
@@ -34,8 +39,6 @@ HAT_temp::HAT_temp(){
 	
 
    HAT_error = noError;
-
-   printf("Starting THERMO-HAT...\n\n");
    
    //wiringPi error check
    if(mySPI < 0){
@@ -61,11 +64,16 @@ HAT_temp::HAT_temp(){
    //happy to be ready!
    printf("\n\n***************RaspberryPi temperature-HAT by Stefan & Jakob is ready!***************\n\n");
 
-   for(int i = 0; i < 5; i++){
+   for(int i = 0; i < 3; i++){
       digitalWrite(LED_RED_PIN, GPIO_HIGH);
-      delay(100);
+      delay(200);
       digitalWrite(LED_RED_PIN, GPIO_LOW);
-      delay(100);
+      digitalWrite(LED_BLUE_PIN, GPIO_HIGH);      
+      delay(200);
+      digitalWrite(LED_BLUE_PIN, GPIO_LOW);
+      digitalWrite(LED_GREEN_PIN, GPIO_HIGH);
+      delay(200);
+      digitalWrite(LED_GREEN_PIN, GPIO_LOW);
    }
 }
 

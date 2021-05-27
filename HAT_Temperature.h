@@ -48,9 +48,9 @@ guide:			command-byte instructions:
 #define LED_GREEN_PIN   6
 #define LED_BLUE_PIN    27
 #define BUTTON_PIN      4
-#define ROUGH_TEMP_OFFS 10
+#define ROUGH_TEMP_OFFS 0
 
-#define USE_PROTOBOARD
+//#define USE_PROTOBOARD
 
 #ifdef USE_PROTOBOARD
     #define GPIO_HIGH       LOW
