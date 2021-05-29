@@ -10,10 +10,10 @@
 //g++ test_wireless.cpp -o test_wireless --std=c++14 -I/usr/local/include -lTgBot -lboost_system -lssl -lcrypto -lpthread -lwiringPi
 //./test_wireless
 
-#include "/home/pi/workspace/TemperatureHAT/raspberrypi-temperatureHAT/HAT_Wireless.h"
-#include "/home/pi/workspace/TemperatureHAT/raspberrypi-temperatureHAT/HAT_Wireless.cpp"
-#include "/home/pi/workspace/TemperatureHAT/raspberrypi-temperatureHAT/HAT_Temperature.h"
-#include "/home/pi/workspace/TemperatureHAT/raspberrypi-temperatureHAT/HAT_Temperature.cpp"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Wireless.h"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Wireless.cpp"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Temperature.h"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Temperature.cpp"
 
 int main(void){
 

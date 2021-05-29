@@ -10,8 +10,8 @@
 //g++ -o test_hardware test_hardware.cpp -lwiringPi
 //./test_hardware
 
-#include "/home/pi/workspace/TemperatureHAT/raspberrypi-temperatureHAT/HAT_Temperature.h"
-#include "/home/pi/workspace/TemperatureHAT/raspberrypi-temperatureHAT/HAT_Temperature.cpp"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Temperature.h"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Temperature.cpp"
 
 int main(void){
 

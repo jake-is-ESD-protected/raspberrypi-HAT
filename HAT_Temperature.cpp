@@ -8,6 +8,7 @@
 */
 
 #include "HAT_Temperature.h"
+#include "HAT_Wireless.h"
 
 /*construct central HAT object.
    -all hardware peripherals are started
@@ -25,7 +26,7 @@ HAT_temp::HAT_temp(){
   	pinMode(LED_RED_PIN, OUTPUT);
 	pinMode(PWRON_PIN, OUTPUT);
 	pinMode(RESET_N_PIN, OUTPUT);
-   pinMode(BUTTON_PIN, INPUT);
+   pinMode(THERMO_BUTTON_PIN, INPUT);
 
 	digitalWrite (LED_RED_PIN, GPIO_HIGH);
    digitalWrite (LED_GREEN_PIN, GPIO_LOW);
@@ -39,6 +40,7 @@ HAT_temp::HAT_temp(){
 	
 
    HAT_error = noError;
+   t_flag = standby;
    
    //wiringPi error check
    if(mySPI < 0){
@@ -198,7 +200,142 @@ uint8_t HAT_temp::isClean(void){
    return HAT_error;
 }
 
+void* pollForButton(void* arg){
+   HAT_temp* pObj = (HAT_temp*) arg;
+   int i = 0;
+   while(1){
+      
+      if(digitalRead(THERMO_BUTTON_PIN) == LOW){
+         pthread_mutex_lock(&(set_flag_mutex));
+         switch(i){
+            case standby:
+               setColor(yellow);
+               //do nothing
+               t_flag = standby;
+               printf("On standby\n");
+               break;
 
+            case passiveSend:
+               setColor(cyan);
+               //enter send-mode
+               t_flag = passiveSend;
+               printf("print-mode\n");
+               pthread_t t_passiveSend[1];
+               pthread_create(&t_passiveSend[1], NULL, passiveSend_state, arg);
+               break;
+
+            case botSend:
+               setColor(purple);
+               //enter chat-mode
+               t_flag = botSend;
+               printf("chat-mode\n");
+               pthread_t t_botSend[1];
+               pthread_create(&t_botSend[1], NULL, botSend_state, arg);
+               break;
+
+            default:
+               break;           
+         }
+         pthread_mutex_unlock(&set_flag_mutex);
+         while(digitalRead(THERMO_BUTTON_PIN) == LOW);
+         i++;         
+         if(i > botSend){
+            i = standby;
+         }
+      }
+   }
+}
+
+void* passiveSend_state(void* arg){
+   HAT_temp* pObj = (HAT_temp*) arg;
+   while(t_flag == passiveSend){
+      pObj->printTempSamples(1);
+   }
+   pthread_exit(NULL);
+}
+
+void* botSend_state(void* arg){
+   printf("enter botmode\n");
+   HAT_temp* pObj = (HAT_temp*) arg;
+   TgBot::Bot* bot = new TgBot::Bot(BOT_TOKEN);
+   while(t_flag == botSend){
+
+      bot->getEvents().onCommand("start", [bot](TgBot::Message::Ptr message) {    
+         bot->getApi().sendMessage(message->chat->id, "Hi, I'm currently wearing my temperature-HAT!");
+      });
+
+      //handle arrival of any message
+      bot->getEvents().onAnyMessage([bot, pObj](TgBot::Message::Ptr message) {
+         printf("User wrote %s\n", message->text.c_str());
+         if (StringTools::startsWith(message->text, "/start")) {
+            return;
+         }
+         if(StringTools::startsWith(message->text, "/temp")){
+            double temp = pObj->getTemp();
+            std::string t = std::to_string(temp);
+            bot->getApi().sendMessage(message->chat->id, "Current temperature on my HAT is: " + t);
+         }
+         else{
+            bot->getApi().sendMessage(message->chat->id, "Sorry, i don't know '" + message->text + "'.");
+         }
+      });
+
+      try {
+         printf("Bot username: %s\n", bot->getApi().getMe()->username.c_str());
+         TgBot::TgLongPoll longPoll(*bot);
+         while (t_flag == botSend) {
+               printf("Long poll started\n");
+               longPoll.start();
+         }
+      } catch (TgBot::TgException& e) {
+         printf("error: %s\n", e.what());
+      }      
+   }
+   delete bot;
+   pthread_exit(NULL);
+}
+
+void setColor(uint8_t color){
+   switch(color){
+      case white:
+         digitalWrite(LED_RED_PIN, HIGH);
+         digitalWrite(LED_GREEN_PIN, HIGH);
+         digitalWrite(LED_BLUE_PIN, HIGH);
+         break;
+      case red:
+         digitalWrite(LED_RED_PIN, HIGH);
+         digitalWrite(LED_GREEN_PIN, LOW);
+         digitalWrite(LED_BLUE_PIN, LOW);
+         break;
+      case green:   
+         digitalWrite(LED_RED_PIN, LOW);
+         digitalWrite(LED_GREEN_PIN, HIGH);
+         digitalWrite(LED_BLUE_PIN, LOW);
+         break;
+      case blue:
+         digitalWrite(LED_RED_PIN, LOW);
+         digitalWrite(LED_GREEN_PIN, LOW);
+         digitalWrite(LED_BLUE_PIN, HIGH);
+         break;
+      case yellow:
+         digitalWrite(LED_RED_PIN, HIGH);
+         digitalWrite(LED_GREEN_PIN, HIGH);
+         digitalWrite(LED_BLUE_PIN, LOW);
+         break;
+      case cyan:
+         digitalWrite(LED_RED_PIN, LOW);
+         digitalWrite(LED_GREEN_PIN, HIGH);
+         digitalWrite(LED_BLUE_PIN, HIGH);
+         break;
+      case purple:
+         digitalWrite(LED_RED_PIN, HIGH);
+         digitalWrite(LED_GREEN_PIN, LOW);
+         digitalWrite(LED_BLUE_PIN, HIGH);
+         break;
+      default:
+         printf("color not implemented.\n");                                                   
+   }
+}
 
 
 

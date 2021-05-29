@@ -98,22 +98,3 @@ uint8_t wirelessService::isClean(void){
    }
    return wireless_error;   
 }
-
-/*init bot-communication
-
-*/
-telegramBot::telegramBot(std::string token){
-   
-   TgBot::Bot bot(token);
-   bot.getEvents().onCommand("start", [&bot](TgBot::Message::Ptr message) {    
-      bot.getApi().sendMessage(message->chat->id, "Hi, I'm currently wearing my temperature-HAT!");
-   });
-}
-
-/*send temperature to telegram chat with bot (TX only, no prompt)
-
-*/
-bool telegramBot::chatTemp(double temp){
-
-   return true;
-}

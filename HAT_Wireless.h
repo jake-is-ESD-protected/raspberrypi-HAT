@@ -50,14 +50,4 @@ public:
     bool pokeSARA(const char* command);
 };
 
-class telegramBot : public wirelessService{
-
-private:
-
-public:
-    telegramBot(std::string token);
-    bool chatTemp(double temp);
-};
-
-
 #endif
