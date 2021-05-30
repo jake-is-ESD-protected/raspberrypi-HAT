@@ -10,27 +10,29 @@
 //g++ test_wireless.cpp -o test_wireless --std=c++14 -I/usr/local/include -lTgBot -lboost_system -lssl -lcrypto -lpthread -lwiringPi
 //./test_wireless
 
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Wireless.h"
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Wireless.cpp"
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Temperature.h"
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Temperature.cpp"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT.h"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT.cpp"
 
 pthread_mutex_t set_flag_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int main(void){
 
 	
-	HAT_temp hardware;
-	sara mysara;
-	mysara.pokeSARA("AT+CGMI\r");
+	HAT hardware;
+
+	hardware.pokeSARA("AT+COPS?\r");
 	delay(1000);
-	mysara.pokeSARA("AT+CGMI\r");
+	hardware.pokeSARA("AT+URAT?\r");
 	delay(1000);	
-	mysara.pokeSARA("AT+CFUN=4\r");
+	hardware.pokeSARA("AT+UMNOPROF=1\r");
 	delay(1000);
-	mysara.pokeSARA("AT+URAT=4,3\r");
+	hardware.pokeSARA("AT+CREG?\r");
+	delay(1000);	
+	hardware.pokeSARA("AT+COPS?\r");
 	delay(1000);
-	// mysara.pokeSARA("AT+CPWROFF\r");
+	// hardware.pokeSARA("AT+CEREG=2\r");
+	// delay(1000);
+	// hardware.pokeSARA("AT+CPWROFF\r");
 	// delay(1000);
 
 		

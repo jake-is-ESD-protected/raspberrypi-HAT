@@ -8,46 +8,22 @@
 */
 
 #include "HAT_Temperature.h"
-#include "HAT_Wireless.h"
 
-/*construct central HAT object.
+/*construct HAT_thermo object.
    -all hardware peripherals are started
    -sets error flag in case of mishaps during init
 */
-
-HAT_temp::HAT_temp(){
+HAT_thermo::HAT_thermo(){
 
    //wiringPi setup:
-   int myWPi = wiringPiSetup();
    int mySPI = wiringPiSPISetupMode(CE_CHANNEL, SPI_CLOCK, SPI_MODE);
-
-   //GPIO-Setup:
-   pinMode(LED_BLUE_PIN, OUTPUT);
-   pinMode(LED_GREEN_PIN, OUTPUT);
-  	pinMode(LED_RED_PIN, OUTPUT);
-	pinMode(PWRON_PIN, OUTPUT);
-	pinMode(RESET_N_PIN, OUTPUT);
-   pinMode(THERMO_BUTTON_PIN, INPUT);
-
-	digitalWrite (LED_RED_PIN, GPIO_HIGH);
-   digitalWrite (LED_GREEN_PIN, GPIO_LOW);
-   digitalWrite (LED_BLUE_PIN, GPIO_LOW);
-   printf("Starting THERMO-HAT...\n\n");
-	digitalWrite (PWRON_PIN, GPIO_LOW);
-   delay(2000);
-   digitalWrite(PWRON_PIN, GPIO_HIGH);
-   delay(2000);
-   digitalWrite (PWRON_PIN, GPIO_LOW);
 	
-
    HAT_error = noError;
    t_flag = standby;
 
-   #ifndef SKIP_INIT
-
    //wiringPi error check
    if(mySPI < 0){
-      printf("wiringPi-setup failed: wiringPi-fd: %d, SPI-fd: %d\n", myWPi, mySPI);
+      printf("wiringPi-setup failed: SPI-fd: %d\n", mySPI);
       HAT_error = wiringPi_error;
       return;
    }
@@ -61,10 +37,6 @@ HAT_temp::HAT_temp(){
       HAT_error = sensor_error_unreachable;
       return;
    }
-
-   #ifdef USE_PROTOBOARD
-      printf("\nInfo: config set to PROTOBOARD\n");
-   #endif
 
    //happy to be ready!
    printf("\n\n***************RaspberryPi temperature-HAT by Stefan & Jakob is ready!***************\n\n");
@@ -80,15 +52,13 @@ HAT_temp::HAT_temp(){
       delay(200);
       digitalWrite(LED_GREEN_PIN, GPIO_LOW);
    }
-
-   #endif
 }
 
 /*print n samples to console
    -returns false if init was not clean
    -contains 500ms delay between samples
 */
-bool HAT_temp::printTempSamples(int n){
+bool HAT_thermo::printTempSamples(int n){
 
    if(isClean() != 1)return false;
 
@@ -112,7 +82,7 @@ bool HAT_temp::printTempSamples(int n){
 /*send a single read-command to sensor and get answer on terminal.
    -returns false if received buffer is empty
 */
-bool HAT_temp::pokeSensor(uint8_t read_command){
+bool HAT_thermo::pokeSensor(uint8_t read_command){
 
    if(isClean() != 1)return false;
 
@@ -153,7 +123,7 @@ bool HAT_temp::pokeSensor(uint8_t read_command){
 /*factory-reset sensor
    -returns false if init was not clean
 */
-bool HAT_temp::resetSensor(void){
+bool HAT_thermo::resetSensor(void){
 
    if(isClean() != 1)return false;
 
@@ -166,7 +136,7 @@ bool HAT_temp::resetSensor(void){
 /*receive single value temp as double
    -returns -999 if init was not clean
 */
-double HAT_temp::getTemp(void){
+double HAT_thermo::getTemp(void){
 
    if(isClean() != 1)return -999;
 
@@ -181,32 +151,9 @@ double HAT_temp::getTemp(void){
    return temp;
 }
 
-/*checks for occured errors and returns/prints it as enum. 
-   -returns 1 in case of clean init
-   -prints errors in detail
-*/
-uint8_t HAT_temp::isClean(void){
 
-   switch (HAT_error){
-      case wiringPi_error :
-         printf("warning: wiringPi-init problems\n");
-         break;
-
-      case noError :
-         break;
-
-      case sensor_error_unreachable :
-         printf("warning: sensor not responding\n");
-         break;
-
-      default :
-         printf("warning: undefined error\n");
-   }
-   return HAT_error;
-}
-
-void* pollForButton(void* arg){
-   HAT_temp* pObj = (HAT_temp*) arg;
+void* pollForButton_thermo(void* arg){
+   HAT_thermo* pObj = (HAT_thermo*) arg;
    int i = 0;
    while(1){
       
@@ -226,7 +173,7 @@ void* pollForButton(void* arg){
                t_flag = passiveSend;
                printf("print-mode\n");
                pthread_t t_passiveSend[1];
-               pthread_create(&t_passiveSend[1], NULL, passiveSend_state, arg);
+               pthread_create(&t_passiveSend[1], NULL, passiveSend_state_thermo, arg);
                break;
 
             case botSend:
@@ -235,7 +182,7 @@ void* pollForButton(void* arg){
                t_flag = botSend;
                printf("chat-mode\n");
                pthread_t t_botSend[1];
-               pthread_create(&t_botSend[1], NULL, botSend_state, arg);
+               pthread_create(&t_botSend[1], NULL, botSend_state_thermo, arg);
                break;
 
             default:
@@ -251,17 +198,17 @@ void* pollForButton(void* arg){
    }
 }
 
-void* passiveSend_state(void* arg){
-   HAT_temp* pObj = (HAT_temp*) arg;
+void* passiveSend_state_thermo(void* arg){
+   HAT_thermo* pObj = (HAT_thermo*) arg;
    while(t_flag == passiveSend){
       pObj->printTempSamples(1);
    }
    pthread_exit(NULL);
 }
 
-void* botSend_state(void* arg){
+void* botSend_state_thermo(void* arg){
    printf("enter botmode\n");
-   HAT_temp* pObj = (HAT_temp*) arg;
+   HAT_thermo* pObj = (HAT_thermo*) arg;
    TgBot::Bot* bot = new TgBot::Bot(BOT_TOKEN);
    while(t_flag == botSend){
 
@@ -299,48 +246,3 @@ void* botSend_state(void* arg){
    delete bot;
    pthread_exit(NULL);
 }
-
-void setColor(uint8_t color){
-   switch(color){
-      case white:
-         digitalWrite(LED_RED_PIN, HIGH);
-         digitalWrite(LED_GREEN_PIN, HIGH);
-         digitalWrite(LED_BLUE_PIN, HIGH);
-         break;
-      case red:
-         digitalWrite(LED_RED_PIN, HIGH);
-         digitalWrite(LED_GREEN_PIN, LOW);
-         digitalWrite(LED_BLUE_PIN, LOW);
-         break;
-      case green:   
-         digitalWrite(LED_RED_PIN, LOW);
-         digitalWrite(LED_GREEN_PIN, HIGH);
-         digitalWrite(LED_BLUE_PIN, LOW);
-         break;
-      case blue:
-         digitalWrite(LED_RED_PIN, LOW);
-         digitalWrite(LED_GREEN_PIN, LOW);
-         digitalWrite(LED_BLUE_PIN, HIGH);
-         break;
-      case yellow:
-         digitalWrite(LED_RED_PIN, HIGH);
-         digitalWrite(LED_GREEN_PIN, HIGH);
-         digitalWrite(LED_BLUE_PIN, LOW);
-         break;
-      case cyan:
-         digitalWrite(LED_RED_PIN, LOW);
-         digitalWrite(LED_GREEN_PIN, HIGH);
-         digitalWrite(LED_BLUE_PIN, HIGH);
-         break;
-      case purple:
-         digitalWrite(LED_RED_PIN, HIGH);
-         digitalWrite(LED_GREEN_PIN, LOW);
-         digitalWrite(LED_BLUE_PIN, HIGH);
-         break;
-      default:
-         printf("color not implemented.\n");                                                   
-   }
-}
-
-
-

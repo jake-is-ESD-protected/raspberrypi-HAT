@@ -1,5 +1,5 @@
-//g++ -o first_test -lasound -lm first_test.cpp
-//./first_test
+//g++ -o audio-sampling -lasound -lm audio-sampling.cpp
+//./audio-sampling
 //based on: https://stackoverflow.com/questions/38615396/sound-recording-play-on-raspberry-pi-using-alsa-in-c
 
 #include <alsa/asoundlib.h>

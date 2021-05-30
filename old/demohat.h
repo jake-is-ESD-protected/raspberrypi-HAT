@@ -52,7 +52,7 @@ guide:			command-byte instructions:
 
 bool hat_init(void);
 
-bool hat_callSARA(void);
+bool hat_callSARA(const char* msg);
 
 bool hat_callSensor(void);
 

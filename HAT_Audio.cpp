@@ -1,8 +1,21 @@
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_i2s.h"
+/*
+	auth:			Jakob Tschavoll
+	brief:			MEMS-mic sampling functions
+	date: 			May 20st, 2021
+	modified by: 	Jakob T.
+	notes:			
+	guide:		    
+*/
+
+#include "HAT_Audio.h"
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 
-sampler::sampler(uint16_t x_sampleRate, uint8_t x_bitDepth, uint32_t x_buflen, const char* x_devName){
+/*construct sampler object.
+   -pcm device is started
+   -sets error flag in case of mishaps during init
+*/
+HAT_audio::HAT_audio(uint16_t x_sampleRate, uint8_t x_bitDepth, uint32_t x_buflen, const char* x_devName){
 
     //set instances:
     sampleRate = x_sampleRate;
@@ -70,7 +83,10 @@ sampler::sampler(uint16_t x_sampleRate, uint8_t x_bitDepth, uint32_t x_buflen, c
     init_rdy = true;
 }
 
-uint8_t sampler::readI2S(){
+/*reads single buffer from audio stream and stores it
+   -get access to buffer via char* getBuf()
+*/
+uint8_t HAT_audio::readI2S(){
 
     if(sampler_err != 0){
         return sampler_err;
@@ -101,7 +117,9 @@ uint8_t sampler::readI2S(){
     return 0;
 }
 
-int32_t sampler::calc_dB_SPL_Z(){
+/*calc rough Z-weighted SPL from single buffer
+*/
+int32_t HAT_audio::calc_dB_SPL_Z(){
 
     if(rdyBuffer == NULL){
         sampler_err = 1;
@@ -124,7 +142,10 @@ int32_t sampler::calc_dB_SPL_Z(){
     return decibel;     
 }
 
-uint8_t sampler::calc_fft(){
+/*calc spectrum of single buffer
+   -quality of spectrum depends on buffer-size
+*/
+uint8_t HAT_audio::calc_fft(){
 
     if(rdyBuffer == NULL){
         sampler_err = 2;
@@ -153,7 +174,10 @@ uint8_t sampler::calc_fft(){
     return 0;
 }
 
-sampler::~sampler(){
+/*destruct sampler object.
+   -buffer memory is freed
+*/
+HAT_audio::~HAT_audio(){
 
     snd_pcm_close(handle);
     free(buffer);
@@ -162,4 +186,20 @@ sampler::~sampler(){
     fftw_free(transform_buf_in); fftw_free(transform_buf_out);
     free(fftBuffer);
     fftBuffer = NULL;
+    delete this;
+}
+
+/*get access to sample buffer
+   -samples are of type int32_t
+*/
+int32_t* HAT_audio::getBuf(){
+
+    return (int32_t*)buffer;
+}
+
+/*get buffer size in samples
+*/
+uint32_t HAT_audio::getBufSize(){
+
+    return (uint32_t)bufSize;
 }

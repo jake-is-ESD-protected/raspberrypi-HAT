@@ -11,7 +11,7 @@
 #include "demohat.h"
 
 
-bool hat_callSARA(void){
+bool hat_callSARA(const char* msg){
 
    //init serial (fd is needed here)
    int mySerial = serialOpen(PORT, BAUDRATE);
@@ -22,9 +22,8 @@ bool hat_callSARA(void){
    }
 
    printf("UART-communication:\n\n");
-   const char bufTransmit[] = "AT+CGMI\r";
-   serialPrintf(mySerial, bufTransmit);
-   printf("sent: %s\n", bufTransmit);
+   serialPrintf(mySerial, msg);
+   printf("sent: %s\n", msg);
 
    //wait, otherwise read call is too fast
    delay(1000);
@@ -62,9 +61,15 @@ int main(void){
 	pinMode(PWRON_PIN, OUTPUT);
 	pinMode(RESET_N_PIN, OUTPUT);
 
-	digitalWrite (LED_PIN, HIGH);
+   digitalWrite (LED_PIN, HIGH);
+   printf("Starting HAT...\n\n");
 	digitalWrite (PWRON_PIN, LOW);
-	digitalWrite (RESET_N_PIN, LOW);
+   delay(2000);
+   digitalWrite(PWRON_PIN, HIGH);
+   delay(2000);
+   digitalWrite (PWRON_PIN, LOW);
+   printf("SARA booting (5s)...\n");
+   delay(5000);
 
    //error check
    printf("\nInitializing...\n\n");
@@ -77,17 +82,17 @@ int main(void){
       delay(100);
    }
 
-   int no = 0;
-   int yes = 0;
-   for(int i = 0; i < 20; i++){
-      if(hat_callSARA()){
-         yes++;
-      }
-      else{
-         no++;
-      }
-   }
-   printf("yes: %d, no: %d\n", yes, no);
+   hat_callSARA("AT+COPS?\r");
+	delay(1000);
+	hat_callSARA("AT+URAT?\r");
+	delay(1000);	
+	hat_callSARA("AT+UMNOPROF=100\r");
+	delay(1000);
+	hat_callSARA("AT+CREG?\r");
+	delay(1000);	
+	hat_callSARA("AT+COPS?\r");
+	delay(1000);
+
    return 0;
 }
 

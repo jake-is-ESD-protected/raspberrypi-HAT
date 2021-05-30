@@ -1,8 +1,17 @@
-//g++ -o i2s_main -lasound -lfftw3 -lm i2s_main.cpp
-//./i2s_main
+/*
+	auth:			Jakob Tschavoll
+	brief:			test sampling and fft
+	date: 			May 30th, 2021
+	modified by: 	
+	notes:			
+	guide:		    
+*/
 
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_i2s.h"
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_i2s.cpp"
+//g++ -o test_i2s_audio -lasound -lfftw3 -lm test_i2s_audio.cpp
+//./test_i2s_audio
+
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Audio.h"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Audio.cpp"
 
 
 int main(){
@@ -18,21 +27,8 @@ int main(){
         fprintf(stderr, "calc dB: %d\n", pMainSampler->calc_dB_SPL_Z());
     }
 
-    //uint8_t i2s_fd = pMainSampler->readI2S();
-
-    fprintf(stderr, "int-buffer size: %d\n", pMainSampler->bufSize);
-    fprintf(stderr, "int-buffer size in samples: %d\n", pMainSampler->bufSizeSamples);
-
-     int fft_fd = pMainSampler->calc_fft();
-    // if(fft_fd != 0){
-    //     fprintf(stderr, "fft calc failed: %d\n", fft_fd);
-    // }
-
-    // for(int i = 0; i < (pMainSampler->bufSizeSamples / 2); i++){
-    //     fprintf(stderr, "%lf\n", pMainSampler->fftBuffer[i]);
-    // }
-    
-    // delete pMainSampler;
+    fprintf(stderr, "int-buffer size: %d\n", pMainSampler->getBufSize());
+    fprintf(stderr, "int-buffer size in samples: %d\n", (pMainSampler->getBufSize() * (BIT_DEPTH / 8)));
 
     return 0;
 
