@@ -8,7 +8,6 @@
 */
 
 #include "HAT_Wireless.h"
-#include "HAT_Temperature.h"
 
 /*construct sara-object
    -opens serial

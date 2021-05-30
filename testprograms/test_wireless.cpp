@@ -15,12 +15,25 @@
 #include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Temperature.h"
 #include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Temperature.cpp"
 
+pthread_mutex_t set_flag_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 int main(void){
 
+	
 	HAT_temp hardware;
-    //telegramBot bot(BOT_TOKEN);
 	sara mysara;
-	mysara.pokeSARA("AT&V\r");
+	mysara.pokeSARA("AT+CGMI\r");
+	delay(1000);
+	mysara.pokeSARA("AT+CGMI\r");
+	delay(1000);	
+	mysara.pokeSARA("AT+CFUN=4\r");
+	delay(1000);
+	mysara.pokeSARA("AT+URAT=4,3\r");
+	delay(1000);
+	// mysara.pokeSARA("AT+CPWROFF\r");
+	// delay(1000);
+
+		
 
     return 0;
 }

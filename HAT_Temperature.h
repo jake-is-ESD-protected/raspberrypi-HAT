@@ -53,6 +53,8 @@ guide:			command-byte instructions:
 
 //#define USE_PROTOBOARD
 
+//#define SKIP_INIT
+
 #ifdef USE_PROTOBOARD
     #define GPIO_HIGH       LOW
     #define GPIO_LOW        HIGH

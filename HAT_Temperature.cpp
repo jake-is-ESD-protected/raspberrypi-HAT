@@ -14,6 +14,7 @@
    -all hardware peripherals are started
    -sets error flag in case of mishaps during init
 */
+
 HAT_temp::HAT_temp(){
 
    //wiringPi setup:
@@ -41,7 +42,9 @@ HAT_temp::HAT_temp(){
 
    HAT_error = noError;
    t_flag = standby;
-   
+
+   #ifndef SKIP_INIT
+
    //wiringPi error check
    if(mySPI < 0){
       printf("wiringPi-setup failed: wiringPi-fd: %d, SPI-fd: %d\n", myWPi, mySPI);
@@ -77,6 +80,8 @@ HAT_temp::HAT_temp(){
       delay(200);
       digitalWrite(LED_GREEN_PIN, GPIO_LOW);
    }
+
+   #endif
 }
 
 /*print n samples to console
@@ -98,7 +103,7 @@ bool HAT_temp::printTempSamples(int n){
 
       uint16_t rawtemp = ((uint16_t)(dbuf[1]) << 8) | dbuf[2];
       double temp = ((double)(rawtemp)) / 128 - ROUGH_TEMP_OFFS;
-      printf("calculated temperature %d: %lf\n", i, temp);
+      printf("calculated temperature: %lf\n", temp);
       delay(500);
    }
    return true;
@@ -273,7 +278,7 @@ void* botSend_state(void* arg){
          if(StringTools::startsWith(message->text, "/temp")){
             double temp = pObj->getTemp();
             std::string t = std::to_string(temp);
-            bot->getApi().sendMessage(message->chat->id, "Current temperature on my HAT is: " + t);
+            bot->getApi().sendMessage(message->chat->id, "Current temperature on my HAT is: " + t + "°C");
          }
          else{
             bot->getApi().sendMessage(message->chat->id, "Sorry, i don't know '" + message->text + "'.");
