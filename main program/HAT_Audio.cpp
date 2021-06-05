@@ -2,7 +2,7 @@
 	auth:			Jakob Tschavoll
 	brief:			MEMS-mic sampling functions
 	date: 			May 20st, 2021
-	modified by: 	Jakob T.
+	modified by: 	Jakob Tschavoll
 	notes:			
 	guide:		    
 */

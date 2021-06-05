@@ -153,7 +153,9 @@ uint8_t HAT::isClean(void){
    return HAT_error;   
 }
 
-
+/*simplify LED-driving and set a color specified in the color-enum
+   -possible colors: white, red, green, blue, yellow, cyan, purple
+*/
 void setColor(uint8_t color){
    switch(color){
       case white:
@@ -191,6 +193,10 @@ void setColor(uint8_t color){
          digitalWrite(LED_GREEN_PIN, LOW);
          digitalWrite(LED_BLUE_PIN, HIGH);
          break;
+      case dark:
+         digitalWrite(LED_RED_PIN, LOW);
+         digitalWrite(LED_GREEN_PIN, LOW);
+         digitalWrite(LED_BLUE_PIN, LOW);
       default:
          printf("color not implemented.\n");                                                   
    }

@@ -1,25 +1,27 @@
 /*
-	auth:			Jakob Tschavoll
+	auth:			Jakob Tschavoll, Stefan Dünser
 	brief:			alpha version of full HAT program
 	date: 			May 28th, 2021
 	modified by: 	
-	notes:			
-	guide:		    
+	notes:			set_flag_mutex should be defined as global variable
+	guide:		    for more info, check out https://github.com/jake-is-ESD-protected/raspberrypi-HAT
 */
 
 //g++ -o main main.cpp --std=c++14 -I/usr/local/include -lTgBot -lboost_system -lssl -lcrypto -lpthread -lwiringPi -lasound -lfftw3 -lm
 //./main
 
 #include "HAT_Temperature.h"
-#include "HAT_Temperature.cpp"
 #include "HAT_Audio.h"
-#include "HAT_Audio.cpp"
 #include "HAT.h"
-#include "HAT.cpp"
+
 
 pthread_mutex_t set_flag_mutex = PTHREAD_MUTEX_INITIALIZER;
+flag t_flag;
+sel_hat hat_type;
 
 int main(void){
+
+
 
     wiringPiSetup();
 
@@ -34,7 +36,6 @@ int main(void){
         printf("Audio-HAT registered. Starting audio-branch.\n");
         hat_type = audio;
     }
-
 
     pthread_t threads[1];
 

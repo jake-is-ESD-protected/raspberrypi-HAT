@@ -64,18 +64,22 @@ enum color{
     yellow,
     cyan,
     purple,
+    dark,
 };
 
 enum flag{
     standby,
     passiveSend,
     botSend,
-} t_flag;
+    off,
+};
+extern flag t_flag;
 
 enum sel_hat{
     thermo,
     audio,
-}hat_type;
+};
+extern sel_hat hat_type;
 
 extern pthread_mutex_t set_flag_mutex;
 

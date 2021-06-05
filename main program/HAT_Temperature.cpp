@@ -151,7 +151,10 @@ double HAT_thermo::getTemp(void){
    return temp;
 }
 
-
+/*polling thread method, gets called via pthread_create
+   -enters one of 3 states and creates threads accordingly
+   -see github-documentation for infos on types of states
+*/
 void* pollForButton_thermo(void* arg){
    HAT_thermo* pObj = (HAT_thermo*) arg;
    int i = 0;
@@ -198,6 +201,9 @@ void* pollForButton_thermo(void* arg){
    }
 }
 
+/*stream samples thread method, gets called via pthread_create
+   -prints thermo-samples every 500ms to console
+*/
 void* passiveSend_state_thermo(void* arg){
    HAT_thermo* pObj = (HAT_thermo*) arg;
    while(t_flag == passiveSend){
@@ -206,6 +212,12 @@ void* passiveSend_state_thermo(void* arg){
    pthread_exit(NULL);
 }
 
+/*create telegram-bot thread method, gets called via pthread_create
+   -starts a bot to chat with
+   -write /start in chat to trigger the bot
+   -write /temp in chat to obtain current temperature
+   -bot gets terminated after switching the state
+*/
 void* botSend_state_thermo(void* arg){
    printf("enter botmode\n");
    HAT_thermo* pObj = (HAT_thermo*) arg;
