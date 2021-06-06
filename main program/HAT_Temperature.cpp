@@ -188,13 +188,21 @@ void* pollForButton_thermo(void* arg){
                pthread_create(&t_botSend[1], NULL, botSend_state_thermo, arg);
                break;
 
+            case mqttPublish:
+               setColor(white);
+               //publish data to mqtt server
+               t_flag = mqttPublish;
+               printf("mqtt-mode\n");
+               pthread_t t_mqtt[1];
+               pthread_create(&t_mqtt[1], NULL, mqtt_state_thermo, arg);
+
             default:
                break;           
          }
          pthread_mutex_unlock(&set_flag_mutex);
          while(digitalRead(THERMO_BUTTON_PIN) == LOW);
          i++;         
-         if(i > botSend){
+         if(i > mqttPublish){
             i = standby;
          }
       }
@@ -256,5 +264,24 @@ void* botSend_state_thermo(void* arg){
       }      
    }
    delete bot;
+   pthread_exit(NULL);
+}
+
+void* mqtt_state_thermo(void* arg){
+
+   printf("enter mqtt-mode\n");
+   HAT_thermo* pObj = (HAT_thermo*) arg;
+
+   mqtt_publisher* myPub = new mqtt_publisher("this_ID", "testTopic", "192.168.2.141", 1883);
+
+   
+   while(t_flag == mqttPublish){
+      double temp = pObj->getTemp();
+      std::string s = std::to_string(temp);
+      char* pc = &s[0];
+      myPub->send_message(pc);
+      delay(2000);
+   }
+   delete myPub;
    pthread_exit(NULL);
 }

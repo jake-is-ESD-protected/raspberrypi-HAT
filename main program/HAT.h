@@ -16,6 +16,7 @@ guide:
 #include <stdio.h>
 #include <tgbot/tgbot.h>
 #include <string>
+#include <mosquittopp.h>
 
 #define BOT_TOKEN           "1806971019:AAHZ7TsycZH6Z402hfbYwqqDHuiEPaEGvhA"
 #define PORT			    "/dev/ttyAMA0"
@@ -31,6 +32,13 @@ guide:
 
 #define GPIO_HIGH           HIGH
 #define GPIO_LOW            LOW
+
+#define MQTT_PORT           1883
+#define MQTT_HOST           "192.168.2.141"
+#define MQTT_ID_THERMO      "T_HAT"
+#define MQTT_ID_AUDIO       "A_HAT"
+#define MQTT_TOPIC_THERMO   "thermo"
+#define MQTT_TOPIC_AUDIO    "audio"
 
 class HAT{
 
@@ -54,6 +62,25 @@ public:
     }HAT_error;    
 };
 
+class mqtt_publisher : public mosqpp::mosquittopp
+{
+    private:
+        const char* host;
+        const char* id;
+        const char* topic;
+        int port;
+        int keepalive;
+
+        void on_connect(int rc);
+        void on_disconnect(int rc);
+        void on_publish(int mid);
+        
+    public:
+        mqtt_publisher(const char *id, const char * _topic, const char *host, int port);
+        ~mqtt_publisher();
+        bool send_message(const char * _message);
+};
+
 void setColor(uint8_t color);
 
 enum color{
@@ -71,6 +98,7 @@ enum flag{
     standby,
     passiveSend,
     botSend,
+    mqttPublish,
     off,
 };
 extern flag t_flag;

@@ -62,5 +62,6 @@ public:
 void* pollForButton_thermo(void* arg);
 void* passiveSend_state_thermo(void* arg);
 void* botSend_state_thermo(void* arg);
+void* mqtt_state_thermo(void* arg);
 
 #endif

@@ -201,3 +201,69 @@ void setColor(uint8_t color){
          printf("color not implemented.\n");                                                   
    }
 }
+
+/*constructs a mqtt client specialized on publishing data
+   -inits mqtt-lib
+   -starts in async mode
+   -starts an external thread
+*/
+mqtt_publisher::mqtt_publisher(const char * _id, const char * _topic, const char* _host, int _port) : mosquittopp(_id){
+
+   mosqpp::lib_init();
+   this->keepalive = 60;
+   this->id = _id;
+   this->port = _port;
+   this->host = _host;
+   this->topic = _topic;
+   connect_async(host, port, keepalive);
+   loop_start();
+}
+
+/*destructs a mqtt client specialized on publishing data
+   -stops loop
+   -kills thread
+   -deallocs recources from lib init
+*/
+mqtt_publisher::~mqtt_publisher(){
+    
+   loop_stop(true);
+   mosqpp::lib_cleanup();
+}
+
+/*publish content
+   -returns false in case of an error
+*/
+bool mqtt_publisher::send_message(const char* _message){
+
+   int ret = publish(NULL, this->topic, strlen(_message), _message, 1, false);
+   return ( ret == MOSQ_ERR_SUCCESS );
+}
+
+/*eventhandler for disconnection
+   -TODO: EXPAND
+*/
+void mqtt_publisher::on_disconnect(int rc) {
+
+   std::cout << ">> mqtt_publisher - disconnection(" << rc << ")" << std::endl;
+}
+
+/*eventhandler for connection
+   -TODO: EXPAND
+*/
+void mqtt_publisher::on_connect(int rc){
+   
+   if ( rc == 0 ) {
+      std::cout << ">> mqtt_publisher - connected with server" << std::endl;
+   } 
+   else {
+      std::cout << ">> mqtt_publisher - Impossible to connect with server(" << rc << ")" << std::endl;
+   }
+}
+
+/*eventhandler for publishing
+   -TODO: EXPAND
+*/
+void mqtt_publisher::on_publish(int mid){
+
+   std::cout << ">> mqtt_publisher - Message (" << mid << ") succeed to be published " << std::endl;
+}
