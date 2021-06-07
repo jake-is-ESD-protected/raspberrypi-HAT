@@ -7,13 +7,9 @@
 	guide:		    for more info, check out https://github.com/jake-is-ESD-protected/raspberrypi-HAT
 */
 
-//g++ -o main main.cpp --std=c++14 -I/usr/local/include -lTgBot -lboost_system -lssl -lcrypto -lpthread -lwiringPi -lasound -lfftw3 -lm
-//./main
-
 #include "HAT_Temperature.h"
 #include "HAT_Audio.h"
 #include "HAT.h"
-
 
 pthread_mutex_t set_flag_mutex = PTHREAD_MUTEX_INITIALIZER;
 flag t_flag;
@@ -21,7 +17,7 @@ sel_hat hat_type;
 
 int main(void){
 
-
+    //delay(5000);
 
     wiringPiSetup();
 
@@ -52,6 +48,7 @@ int main(void){
         if(pMainHAT_audio->isClean() != 1){
             printf("Warning: init not clean, check above error.\n");
         }
+        ///TODO: Do stuff
     }
     pthread_exit(NULL);
     return 0;

@@ -236,7 +236,7 @@ mqtt_publisher::~mqtt_publisher(){
 bool mqtt_publisher::send_message(const char* _message){
 
    int ret = publish(NULL, this->topic, strlen(_message), _message, 1, false);
-   return ( ret == MOSQ_ERR_SUCCESS );
+   return (ret == MOSQ_ERR_SUCCESS);
 }
 
 /*eventhandler for disconnection
@@ -244,7 +244,7 @@ bool mqtt_publisher::send_message(const char* _message){
 */
 void mqtt_publisher::on_disconnect(int rc) {
 
-   std::cout << ">> mqtt_publisher - disconnection(" << rc << ")" << std::endl;
+   printf(">> mqtt_publisher - disconnection(%d)\n", rc);
 }
 
 /*eventhandler for connection
@@ -253,10 +253,10 @@ void mqtt_publisher::on_disconnect(int rc) {
 void mqtt_publisher::on_connect(int rc){
    
    if ( rc == 0 ) {
-      std::cout << ">> mqtt_publisher - connected with server" << std::endl;
+      printf(">> mqtt_publisher - connected with server\n");
    } 
    else {
-      std::cout << ">> mqtt_publisher - Impossible to connect with server(" << rc << ")" << std::endl;
+      printf(">> mqtt_publisher - Impossible to connect with server(%d)\n", rc);
    }
 }
 
@@ -265,5 +265,5 @@ void mqtt_publisher::on_connect(int rc){
 */
 void mqtt_publisher::on_publish(int mid){
 
-   std::cout << ">> mqtt_publisher - Message (" << mid << ") succeed to be published " << std::endl;
+   printf(">> mqtt_publisher - Message (%d) succeed to be published\n", mid);
 }

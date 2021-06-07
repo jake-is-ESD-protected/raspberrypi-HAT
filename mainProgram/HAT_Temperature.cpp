@@ -152,7 +152,7 @@ double HAT_thermo::getTemp(void){
 }
 
 /*polling thread method, gets called via pthread_create
-   -enters one of 3 states and creates threads accordingly
+   -enters one of 4 states and creates threads accordingly
    -see github-documentation for infos on types of states
 */
 void* pollForButton_thermo(void* arg){
@@ -161,6 +161,7 @@ void* pollForButton_thermo(void* arg){
    while(1){
       
       if(digitalRead(THERMO_BUTTON_PIN) == LOW){
+
          pthread_mutex_lock(&(set_flag_mutex));
          switch(i){
             case standby:
@@ -267,6 +268,9 @@ void* botSend_state_thermo(void* arg){
    pthread_exit(NULL);
 }
 
+/*create a mqtt publisher to send data to (host is local)
+   -starts a mqtt publisher-client
+*/
 void* mqtt_state_thermo(void* arg){
 
    printf("enter mqtt-mode\n");
