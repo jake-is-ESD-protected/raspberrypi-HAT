@@ -197,9 +197,26 @@ void setColor(uint8_t color){
          digitalWrite(LED_RED_PIN, LOW);
          digitalWrite(LED_GREEN_PIN, LOW);
          digitalWrite(LED_BLUE_PIN, LOW);
+         break;
       default:
          printf("color not implemented.\n");                                                   
    }
+}
+
+/*LED-showcase state
+
+*/
+void* color_state(void* arg){
+
+   uint8_t thisColor = white;
+   while(t_flag == LEDdemo){
+      while(thisColor <= dark){
+         setColor(thisColor);
+         thisColor++;
+         delay(200);
+      }  
+   }
+   pthread_exit(NULL);
 }
 
 /*constructs a mqtt client specialized on publishing data

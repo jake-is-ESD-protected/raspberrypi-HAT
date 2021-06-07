@@ -82,6 +82,7 @@ class mqtt_publisher : public mosqpp::mosquittopp
 };
 
 void setColor(uint8_t color);
+void* color_state(void* arg);
 
 enum color{
     white,
@@ -96,6 +97,7 @@ enum color{
 
 enum flag{
     standby,
+    LEDdemo,
     passiveSend,
     botSend,
     mqttPublish,

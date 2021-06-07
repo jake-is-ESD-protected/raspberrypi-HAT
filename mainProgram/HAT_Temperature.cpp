@@ -171,6 +171,14 @@ void* pollForButton_thermo(void* arg){
                printf("On standby\n");
                break;
 
+            case LEDdemo:
+               //show LEDs
+               t_flag = LEDdemo;
+               printf("blinking\n");
+               pthread_t t_LEDdemo[1];
+               pthread_create(&t_LEDdemo[1], NULL, color_state, NULL);
+               break;
+               
             case passiveSend:
                setColor(cyan);
                //enter send-mode
@@ -228,7 +236,6 @@ void* passiveSend_state_thermo(void* arg){
    -bot gets terminated after switching the state
 */
 void* botSend_state_thermo(void* arg){
-   printf("enter botmode\n");
    HAT_thermo* pObj = (HAT_thermo*) arg;
    TgBot::Bot* bot = new TgBot::Bot(BOT_TOKEN);
    while(t_flag == botSend){
@@ -273,7 +280,6 @@ void* botSend_state_thermo(void* arg){
 */
 void* mqtt_state_thermo(void* arg){
 
-   printf("enter mqtt-mode\n");
    HAT_thermo* pObj = (HAT_thermo*) arg;
 
    mqtt_publisher* myPub = new mqtt_publisher("this_ID", "testTopic", "192.168.2.141", 1883);
@@ -281,7 +287,7 @@ void* mqtt_state_thermo(void* arg){
    
    while(t_flag == mqttPublish){
       double temp = pObj->getTemp();
-      std::string s = std::to_string(temp);
+      std::string s = std::to_string(temp) + "°C";
       char* pc = &s[0];
       myPub->send_message(pc);
       delay(2000);
