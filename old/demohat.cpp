@@ -105,6 +105,16 @@ int main(void){
 	delay(1000);
    hat_callSARA("AT+UMNOPROF?\r");
 	delay(1000);
+   hat_callSARA("AT+COPS=2\r");
+	delay(1000);	
+	hat_callSARA("AT+COPS?\r");
+	delay(1000);
+   hat_callSARA("AT+CIND?\r");
+   delay(1000);
+   hat_callSARA("AT+UBANDMASK=0,524293\r");
+   delay(1000);
+   hat_callSARA("AT+CIND?\r");
+   delay(1000);     
    // hat_callSARA("AT+CFUN=15\r");
 	// delay(15000);
 

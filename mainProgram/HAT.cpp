@@ -219,6 +219,44 @@ void* color_state(void* arg){
    pthread_exit(NULL);
 }
 
+/*call SARA to receive status-bytes
+
+*/
+void* SARA_state(void* arg){
+
+   HAT* pHAT = (HAT*)arg;
+   while(t_flag == SARA){
+
+      pHAT->pokeSARA("AT+CGMM\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+UMNOPROF?\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+GMR\r");
+      delay(1000);	
+      pHAT->pokeSARA("AT+CIND?\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+CFUN?\r");
+      delay(1000);	
+      pHAT->pokeSARA("AT+COPS?\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+UGPIOC=16,10\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+UMNOPROF?\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+COPS=2\r");
+      delay(1000);	
+      pHAT->pokeSARA("AT+COPS?\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+CIND?\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+UBANDMASK=0,524293\r");
+      delay(1000);
+      pHAT->pokeSARA("AT+CIND?\r");
+      delay(1000);
+   }
+   pthread_exit(NULL);
+}
+
 /*constructs a mqtt client specialized on publishing data
    -inits mqtt-lib
    -starts in async mode

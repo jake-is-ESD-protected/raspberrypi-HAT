@@ -34,10 +34,11 @@ guide:
 #define GPIO_LOW            LOW
 
 //constants for thingsspeak
-#define CHANNEL_ID          (std::string)"1413297"
-#define MQTT_HOST           (std::string)"mqtt.thingspeak.com"
-#define API_KEY             (std::string)"7F9TGV6JCRCN2OHN"
+#define CHANNEL_ID          (const char*)"ThermoID"
+#define MQTT_HOST           (const char*)"localhost"
+#define MQTT_TOPIC          (const char*)"thermo"
 #define MQTT_PORT           1883
+
 
 class HAT{
 
@@ -82,6 +83,7 @@ class mqtt_publisher : public mosqpp::mosquittopp
 
 void setColor(uint8_t color);
 void* color_state(void* arg);
+void* SARA_state(void* arg);
 
 enum color{
     white,
@@ -99,6 +101,7 @@ enum flag{
     LEDdemo,
     passiveSend,
     botSend,
+    SARA,
     mqttPublish,
     off,
 };

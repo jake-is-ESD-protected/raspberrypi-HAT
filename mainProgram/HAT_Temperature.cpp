@@ -196,6 +196,15 @@ void* pollForButton_thermo(void* arg){
                pthread_t t_botSend[1];
                pthread_create(&t_botSend[1], NULL, botSend_state_thermo, arg);
                break;
+               
+            case SARA:
+               setColor(green);
+               //ask SARA for status bytes
+               t_flag = SARA;
+               printf("SARA-mode\n");
+               pthread_t t_SARA[1];
+               pthread_create(&t_SARA[1], NULL, SARA_state, arg);
+               break;
 
             case mqttPublish:
                setColor(white);
@@ -282,22 +291,15 @@ void* mqtt_state_thermo(void* arg){
 
    HAT_thermo* pObj = (HAT_thermo*) arg;
 
-   std::string topic = "channels/" + CHANNEL_ID + "/publish/fields/field1/" + API_KEY;
-   std::string channelID = CHANNEL_ID;
-   std::string host = MQTT_HOST;
 
-   char* pChannelID = &channelID[0];
-   char* pTopic = &topic[0];
-   char* pHost = &host[0];
-
-   mqtt_publisher* myPub = new mqtt_publisher(pChannelID, pTopic, pHost, MQTT_PORT);
+   mqtt_publisher* myPub = new mqtt_publisher(CHANNEL_ID, MQTT_TOPIC, MQTT_HOST, MQTT_PORT);
 
    while(t_flag == mqttPublish){
       double temp = pObj->getTemp();
-      std::string s = "field1=" + std::to_string(temp);
+      std::string s = std::to_string(temp);
       char* pc = &s[0];
       myPub->send_message(pc);
-      delay(2000);
+      delay(15000);
    }
    delete myPub;
    pthread_exit(NULL);
