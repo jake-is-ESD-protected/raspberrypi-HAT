@@ -282,12 +282,19 @@ void* mqtt_state_thermo(void* arg){
 
    HAT_thermo* pObj = (HAT_thermo*) arg;
 
-   mqtt_publisher* myPub = new mqtt_publisher("this_ID", "testTopic", "192.168.2.141", 1883);
+   std::string topic = "channels/" + CHANNEL_ID + "/publish/fields/field1/" + API_KEY;
+   std::string channelID = CHANNEL_ID;
+   std::string host = MQTT_HOST;
 
-   
+   char* pChannelID = &channelID[0];
+   char* pTopic = &topic[0];
+   char* pHost = &host[0];
+
+   mqtt_publisher* myPub = new mqtt_publisher(pChannelID, pTopic, pHost, MQTT_PORT);
+
    while(t_flag == mqttPublish){
       double temp = pObj->getTemp();
-      std::string s = std::to_string(temp) + "°C";
+      std::string s = "field1=" + std::to_string(temp);
       char* pc = &s[0];
       myPub->send_message(pc);
       delay(2000);

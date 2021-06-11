@@ -33,12 +33,11 @@ guide:
 #define GPIO_HIGH           HIGH
 #define GPIO_LOW            LOW
 
+//constants for thingsspeak
+#define CHANNEL_ID          (std::string)"1413297"
+#define MQTT_HOST           (std::string)"mqtt.thingspeak.com"
+#define API_KEY             (std::string)"7F9TGV6JCRCN2OHN"
 #define MQTT_PORT           1883
-#define MQTT_HOST           "192.168.2.141"
-#define MQTT_ID_THERMO      "T_HAT"
-#define MQTT_ID_AUDIO       "A_HAT"
-#define MQTT_TOPIC_THERMO   "thermo"
-#define MQTT_TOPIC_AUDIO    "audio"
 
 class HAT{
 

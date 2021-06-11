@@ -47,6 +47,7 @@ guide:			command-byte instructions:
 
 #define ROUGH_TEMP_OFFS     0
 
+
 class HAT_thermo : public HAT{
 
 private:

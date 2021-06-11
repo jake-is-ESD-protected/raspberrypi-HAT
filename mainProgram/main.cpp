@@ -17,8 +17,6 @@ sel_hat hat_type;
 
 int main(void){
 
-    //delay(5000);
-
     wiringPiSetup();
 
     if(digitalRead(THERMO_BUTTON_PIN) == HIGH){

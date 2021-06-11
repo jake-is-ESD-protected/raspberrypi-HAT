@@ -61,17 +61,19 @@ int main(void){
 	pinMode(PWRON_PIN, OUTPUT);
 	pinMode(RESET_N_PIN, OUTPUT);
 
-   // digitalWrite (LED_PIN, HIGH);
-   // printf("Starting HAT...\n\n");
-	// digitalWrite (PWRON_PIN, LOW);
-   // delay(2000);
-   // digitalWrite(PWRON_PIN, HIGH);
-   // delay(2000);
-   // digitalWrite (PWRON_PIN, LOW);
+   digitalWrite (LED_PIN, HIGH);
+   printf("Starting HAT...\n\n");
+	digitalWrite (PWRON_PIN, LOW);
+   delay(2000);
+   digitalWrite(PWRON_PIN, HIGH);
+   delay(2000);
+   digitalWrite (PWRON_PIN, LOW);
 
-   // delay(1000);
-   //hat_callSARA("AT+UMNOPROF?\r");
-	// delay(1000);
+   //hat_callSARA("AT+UMNOPROF=0\r");
+
+   delay(2000);
+   hat_callSARA("AT+UMNOPROF?\r");
+	delay(1000);
    
    // printf("SARA booting (15s)...\n");
    // delay(30000);
@@ -87,8 +89,20 @@ int main(void){
    //    delay(100);
    // }
 
-   // hat_callSARA("AT+CGMM\r");
-	// delay(1000);
+   hat_callSARA("AT+CGMM\r");
+	delay(1000);
+   hat_callSARA("AT+UMNOPROF?\r");
+	delay(1000);
+   hat_callSARA("AT+GMR\r");
+	delay(1000);	
+	hat_callSARA("AT+CIND?\r");
+	delay(1000);
+	hat_callSARA("AT+CFUN?\r");
+	delay(1000);	
+	hat_callSARA("AT+COPS?\r");
+	delay(1000);
+	hat_callSARA("AT+UGPIOC=16,10\r");
+	delay(1000);
    hat_callSARA("AT+UMNOPROF?\r");
 	delay(1000);
    // hat_callSARA("AT+CFUN=15\r");
