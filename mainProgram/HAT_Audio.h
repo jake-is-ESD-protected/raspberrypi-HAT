@@ -68,4 +68,6 @@ public:
     uint32_t getBufSize();
 };
 
+void CreateWavHeader(uint8_t* header, int waveDataSize, int samplingRate, int bitDepth);
+
 #endif

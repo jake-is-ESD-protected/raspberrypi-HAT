@@ -1,7 +1,7 @@
 /*
 	auth:			   Jakob Tschavoll, Stefan Dünser
 	brief:			General HAT-class which only touches features BOTH HATs have:
-                  SARA-module, RGB-LED
+                  RGB-LED, button
 	date: 			May 30st, 2021
 	modified by: 	Jakob T.
 	notes:			
@@ -13,103 +13,25 @@
 /*construct HAT-object
    -opens serial
    -GPIO init
-   -boots SARA
 */
 HAT::HAT(void){
    HAT_error = noError;
-
-   int chk = wiringPiSetup();
-   if(chk < 0){
-      printf("WiringPi init problems...\n");
-      HAT_error = wiringPi_error;
-      return;
-   }
 
    //GPIO-Setup:
    pinMode(LED_BLUE_PIN, OUTPUT);
    pinMode(LED_GREEN_PIN, OUTPUT);
   	pinMode(LED_RED_PIN, OUTPUT);
-	pinMode(PWRON_PIN, OUTPUT);
-	pinMode(RESET_N_PIN, OUTPUT);
-   pinMode(THERMO_BUTTON_PIN, INPUT);
-
-   //wiringPi-setup
-   serial = serialOpen(PORT, BAUDRATE);
-   if(serial < 0){
-      printf("UART-setup failed in SARA-init\n");
-      HAT_error = error_uart;
-      return;
-   }
 
    digitalWrite (LED_RED_PIN, GPIO_HIGH);
    digitalWrite (LED_GREEN_PIN, GPIO_LOW);
    digitalWrite (LED_BLUE_PIN, GPIO_LOW);
    printf("Starting HAT...\n\n");
-	digitalWrite (PWRON_PIN, GPIO_LOW);
-   delay(2000);
-   digitalWrite(PWRON_PIN, GPIO_HIGH);
-   delay(2000);
-   digitalWrite (PWRON_PIN, GPIO_LOW);
-   printf("SARA booting (5s)...\n");
-   delay(5000);
 }
 
 /*destruct sara-object
-   -closes serial
 */
 HAT::~HAT(){
-   serialClose(serial);
    HAT_error = noInit;
-}
-
-/*send command to SARA and get printed answers
-   -opens serial
-*/
-bool HAT::pokeSARA(const char* message){
-   if(isClean() != 1)return false;
-
-   serialPrintf(serial, message);
-   printf("command sent: %s\n", message);
-
-   //wait, otherwise read call is too fast
-   delay(2000);
-   
-   //RX:
-	unsigned char bufReceive[500];
-	int receiveLen = serialDataAvail(serial);
-   if (receiveLen == 0) {
-		printf("Error: Empty string!\n");
-      HAT_error = sara_error_unreachable;
-      return false;
-	}
-	else if(receiveLen < 0){
-		printf("Error: Unable to receive!\n");
-      HAT_error = error_uart;
-      return false;
-	}
-   else{
-      for(int i = 0; i < receiveLen; i++){
-         bufReceive[i] = serialGetchar(serial);
-         printf("%c", bufReceive[i]);
-      }
-      printf("\n");
-      //serialFlush(serial);
-
-      while(1){
-         int size = serialDataAvail(serial);
-         if(size > 0){
-            printf("DEBUG\n");
-            for(int i = 0; i < receiveLen; i++){
-               bufReceive[i] = serialGetchar(serial);
-               printf("%c", bufReceive[i]);
-            }
-            break;
-         }
-      }
-   }
-
-
-   return true;
 }
 
 /*checks for occured errors and returns/prints it as enum.
@@ -125,14 +47,6 @@ uint8_t HAT::isClean(void){
          break;
 
       case noError :
-         break;
-
-      case error_uart :
-         printf("warning: serial-init problems\n");
-         break;
-
-      case sara_error_unreachable :
-         printf("warning: SARA not responding\n");
          break;
 
       case wiringPi_error :
@@ -215,44 +129,6 @@ void* color_state(void* arg){
          thisColor++;
          delay(200);
       }  
-   }
-   pthread_exit(NULL);
-}
-
-/*call SARA to receive status-bytes
-
-*/
-void* SARA_state(void* arg){
-
-   HAT* pHAT = (HAT*)arg;
-   while(t_flag == SARA){
-
-      pHAT->pokeSARA("AT+CGMM\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+UMNOPROF?\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+GMR\r");
-      delay(1000);	
-      pHAT->pokeSARA("AT+CIND?\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+CFUN?\r");
-      delay(1000);	
-      pHAT->pokeSARA("AT+COPS?\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+UGPIOC=16,10\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+UMNOPROF?\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+COPS=2\r");
-      delay(1000);	
-      pHAT->pokeSARA("AT+COPS?\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+CIND?\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+UBANDMASK=0,524293\r");
-      delay(1000);
-      pHAT->pokeSARA("AT+CIND?\r");
-      delay(1000);
    }
    pthread_exit(NULL);
 }

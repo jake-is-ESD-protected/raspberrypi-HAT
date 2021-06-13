@@ -196,15 +196,6 @@ void* pollForButton_thermo(void* arg){
                pthread_t t_botSend[1];
                pthread_create(&t_botSend[1], NULL, botSend_state_thermo, arg);
                break;
-               
-            case SARA:
-               setColor(green);
-               //ask SARA for status bytes
-               t_flag = SARA;
-               printf("SARA-mode\n");
-               pthread_t t_SARA[1];
-               pthread_create(&t_SARA[1], NULL, SARA_state, arg);
-               break;
 
             case mqttPublish:
                setColor(white);

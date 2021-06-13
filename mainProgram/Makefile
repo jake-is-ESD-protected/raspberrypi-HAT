@@ -7,7 +7,7 @@
 all: main
 
 main: main.cpp
-	g++ main.cpp HAT.cpp HAT_Audio.cpp HAT_Temperature.cpp wav.cpp -o main --std=c++14 -I/usr/local/include -lTgBot -lboost_system -lssl -lcrypto -lpthread -lwiringPi -lasound -lfftw3 -lm -lmosquittopp
+	g++ main.cpp HAT.cpp HAT_Audio.cpp HAT_Temperature.cpp -o main --std=c++14 -I/usr/local/include -lTgBot -lboost_system -lssl -lcrypto -lpthread -lwiringPi -lasound -lfftw3 -lm -lmosquittopp
 
 clean:
 	rm -f *.o main	

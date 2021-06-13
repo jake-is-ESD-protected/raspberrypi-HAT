@@ -12,19 +12,13 @@ guide:
 
 #include <inttypes.h>
 #include <wiringPi.h>
-#include <wiringSerial.h>
 #include <stdio.h>
 #include <tgbot/tgbot.h>
 #include <string>
 #include <mosquittopp.h>
 
 #define BOT_TOKEN           "1806971019:AAHZ7TsycZH6Z402hfbYwqqDHuiEPaEGvhA"
-#define PORT			    "/dev/ttyAMA0"
-#define BAUDRATE		    115200
 
-#define PWRON_PIN 		    2
-#define RESET_N_PIN 	    3
-#define LED_RED_PIN         5
 #define LED_GREEN_PIN       6
 #define LED_BLUE_PIN        27
 #define THERMO_BUTTON_PIN   4
@@ -48,14 +42,11 @@ private:
 public:
     HAT(void);
     ~HAT();
-    bool pokeSARA(const char* command);
     uint8_t isClean(void);
 
     enum error{
         noInit,
         noError,
-        error_uart,
-        sara_error_unreachable,
         wiringPi_error,
         sensor_error_unreachable,
         NA,
@@ -83,7 +74,6 @@ class mqtt_publisher : public mosqpp::mosquittopp
 
 void setColor(uint8_t color);
 void* color_state(void* arg);
-void* SARA_state(void* arg);
 
 enum color{
     white,
@@ -101,7 +91,6 @@ enum flag{
     LEDdemo,
     passiveSend,
     botSend,
-    SARA,
     mqttPublish,
     off,
 };
@@ -111,8 +100,8 @@ enum sel_hat{
     thermo,
     audio,
 };
-extern sel_hat hat_type;
 
+extern sel_hat hat_type;
 extern pthread_mutex_t set_flag_mutex;
 
 #endif
