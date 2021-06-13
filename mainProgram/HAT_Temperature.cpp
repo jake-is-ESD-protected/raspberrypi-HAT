@@ -204,6 +204,9 @@ void* pollForButton_thermo(void* arg){
                printf("mqtt-mode\n");
                pthread_t t_mqtt[1];
                pthread_create(&t_mqtt[1], NULL, mqtt_state_thermo, arg);
+               delay(100);
+               setColor(dark);
+               break;
 
             default:
                break;           
@@ -281,11 +284,10 @@ void* botSend_state_thermo(void* arg){
 void* mqtt_state_thermo(void* arg){
 
    HAT_thermo* pObj = (HAT_thermo*) arg;
-
-
    mqtt_publisher* myPub = new mqtt_publisher(CHANNEL_ID, MQTT_TOPIC, MQTT_HOST, MQTT_PORT);
 
    while(t_flag == mqttPublish){
+      
       double temp = pObj->getTemp();
       std::string s = std::to_string(temp);
       char* pc = &s[0];
@@ -293,5 +295,15 @@ void* mqtt_state_thermo(void* arg){
       delay(15000);
    }
    delete myPub;
+   pthread_exit(NULL);
+}
+
+void* thingspeakServer(void* arg){
+
+   std::string filename = "/home/pi/workspace/HATlib/raspberrypi-HAT/mainProgram/mqttThingspeak.py";
+   std::string command = "python ";
+   command += filename;
+   system(command.c_str());
+
    pthread_exit(NULL);
 }

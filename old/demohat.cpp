@@ -41,6 +41,7 @@ bool hat_callSARA(const char* msg){
    else{
       for(int i = 0; i < receiveLen; i++){
          bufReceive[i] = serialGetchar(mySerial);
+          printf("%d\n", i);
          printf("%c", bufReceive[i]);
       }
       printf("\n");

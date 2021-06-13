@@ -58,7 +58,8 @@ client.loop_forever()
 
  
 if __name__ == "__main__":
+    print("started pthon script")
     while True:
         measure(channel, msg)
         # free thingspeak account has an api limit of 15sec
-        time.sleep(15)
+        time.sleep(20)

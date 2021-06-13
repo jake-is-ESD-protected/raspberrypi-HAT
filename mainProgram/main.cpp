@@ -31,22 +31,29 @@ int main(void){
         hat_type = audio;
     }
 
-    pthread_t threads[1];
+    pthread_t threads[2];
 
     if(hat_type == thermo){
         HAT_thermo* pMainHAT_thermo = new HAT_thermo();
         if(pMainHAT_thermo->isClean() != 1){
             printf("Warning: init not clean, check above error.\n");
         }
+
+        pthread_create(&threads[2], NULL, thingspeakServer, NULL);
         pthread_create(&threads[1], NULL, pollForButton_thermo, pMainHAT_thermo);
         pthread_join(threads[1], NULL);
+        pthread_join(threads[2], NULL);
     }
-    else{
+    else if(hat_type == audio){
         HAT_audio* pMainHAT_audio = new HAT_audio(SAMPLE_RATE, BIT_DEPTH, BUF_LEN, DEV_NAME);
         if(pMainHAT_audio->isClean() != 1){
             printf("Warning: init not clean, check above error.\n");
         }
-        ///TODO: Do stuff
+        pthread_create(&threads[1], NULL, pollForButton_audio, pMainHAT_audio);
+        pthread_join(threads[1], NULL);
+    }
+    else{
+        printf("unable to detect HAT\nexiting program...\n");
     }
     pthread_exit(NULL);
     return 0;

@@ -16,9 +16,11 @@ guide:
 #include <tgbot/tgbot.h>
 #include <string>
 #include <mosquittopp.h>
+#include <pthread.h>
 
 #define BOT_TOKEN           "1806971019:AAHZ7TsycZH6Z402hfbYwqqDHuiEPaEGvhA"
 
+#define LED_RED_PIN         5
 #define LED_GREEN_PIN       6
 #define LED_BLUE_PIN        27
 #define THERMO_BUTTON_PIN   4

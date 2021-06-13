@@ -23,7 +23,6 @@
 #define BAUDRATE		    115200
 #define PWRON_PIN 		    2
 #define RESET_N_PIN 	    3
-#define LED_RED_PIN         5
 
 bool pokeSARA(const char* message){
 

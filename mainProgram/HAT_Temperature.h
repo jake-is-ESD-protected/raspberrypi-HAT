@@ -15,10 +15,7 @@ guide:			command-byte instructions:
 //libs
 #include <stdio.h>
 #include <wiringPiSPI.h>
-#include <wiringSerial.h>
 #include <wiringPi.h>
-#include <inttypes.h>
-#include <pthread.h>
 #include "HAT.h"
 
 //register adress of ADT7310
@@ -64,5 +61,6 @@ void* pollForButton_thermo(void* arg);
 void* passiveSend_state_thermo(void* arg);
 void* botSend_state_thermo(void* arg);
 void* mqtt_state_thermo(void* arg);
+void* thingspeakServer(void* arg);
 
 #endif

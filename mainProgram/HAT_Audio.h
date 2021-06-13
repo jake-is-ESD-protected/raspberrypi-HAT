@@ -13,7 +13,6 @@ guide:
 
 //libs
 #include <alsa/asoundlib.h>
-#include <inttypes.h>
 #include <math.h>
 #include <fftw3.h>
 #include <complex.h>
@@ -69,5 +68,10 @@ public:
 };
 
 void CreateWavHeader(uint8_t* header, int waveDataSize, int samplingRate, int bitDepth);
+void* pollForButton_audio(void* arg);
+void* passiveSend_state_audio(void* arg);
+void* botSend_state_audio(void* arg);
+void* mqtt_state_audio(void* arg);
+
 
 #endif

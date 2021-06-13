@@ -8,6 +8,7 @@
 */
 
 #include "HAT_Audio.h"
+#include <tgbot/tgbot.h>
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 
@@ -266,4 +267,148 @@ void CreateWavHeader(uint8_t* header, int waveDataSize, int samplingRate, int bi
     header[510] = (uint8_t)((waveDataSize >> 16) & 0xFF);
     header[511] = (uint8_t)((waveDataSize >> 24) & 0xFF);
     //real samples get appended here
+}
+
+/*polling thread method, gets called via pthread_create
+   -enters one of 5 states and creates threads accordingly
+   -see github-documentation for infos on types of states
+*/
+void* pollForButton_audio(void* arg){
+    HAT_audio* pObj = (HAT_audio*) arg;
+    int i = 0;
+    while(1){
+      
+        if(digitalRead(THERMO_BUTTON_PIN) == LOW){
+
+            pthread_mutex_lock(&(set_flag_mutex));
+            switch(i){
+                case standby:
+                setColor(yellow);
+                //do nothing
+                t_flag = standby;
+                printf("On standby\n");
+                break;
+
+                case LEDdemo:
+                //show LEDs
+                t_flag = LEDdemo;
+                printf("blinking\n");
+                pthread_t t_LEDdemo[1];
+                pthread_create(&t_LEDdemo[1], NULL, color_state, NULL);
+                break;
+                
+                case passiveSend:
+                setColor(cyan);
+                //enter send-mode
+                t_flag = passiveSend;
+                printf("print-mode\n");
+                pthread_t t_passiveSend[1];
+                pthread_create(&t_passiveSend[1], NULL, passiveSend_state_audio, arg);
+                break;
+
+                case botSend:
+                setColor(purple);
+                //enter chat-mode
+                t_flag = botSend;
+                printf("chat-mode\n");
+                pthread_t t_botSend[1];
+                pthread_create(&t_botSend[1], NULL, botSend_state_audio, arg);
+                break;
+
+                case mqttPublish:
+                setColor(white);
+                //publish data to mqtt server
+                t_flag = mqttPublish;
+                printf("mqtt-mode\n");
+                pthread_t t_mqtt[1];
+                pthread_create(&t_mqtt[1], NULL, mqtt_state_audio, arg);
+
+                default:
+                break;           
+            }
+            pthread_mutex_unlock(&set_flag_mutex);
+            while(digitalRead(AUDIO_BUTTON_PIN) == LOW);
+            i++;         
+            if(i > mqttPublish){
+                i = standby;
+            }
+        }
+    }
+}
+
+/*stream samples thread method, gets called via pthread_create
+   -prints dBSPL-Z values to console
+*/
+void* passiveSend_state_audio(void* arg){
+    HAT_audio* pObj = (HAT_audio*) arg;
+    while(t_flag == passiveSend){
+        int32_t db = pObj->calc_dB_SPL_Z();
+        printf("sound pressure level (Z): %d", db);
+   }
+   pthread_exit(NULL);
+}
+
+/*create telegram-bot thread method, gets called via pthread_create
+   -starts a bot to chat with
+   -write /start in chat to trigger the bot
+   -write /temp in chat to obtain current temperature
+   -bot gets terminated after switching the state
+*/
+void* botSend_state_audio(void* arg){
+    HAT_audio* pObj = (HAT_audio*) arg;
+    TgBot::Bot* bot = new TgBot::Bot(BOT_TOKEN);
+    while(t_flag == botSend){
+
+        bot->getEvents().onCommand("start", [bot](TgBot::Message::Ptr message) {    
+            bot->getApi().sendMessage(message->chat->id, "Hi, I'm currently wearing my audio-HAT!");
+        });
+
+        //handle arrival of any message
+        bot->getEvents().onAnyMessage([bot, pObj](TgBot::Message::Ptr message) {
+            printf("User wrote %s\n", message->text.c_str());
+            if (StringTools::startsWith(message->text, "/start")) {
+                return;
+            }
+            if(StringTools::startsWith(message->text, "/sound")){
+                int32_t db = pObj->calc_dB_SPL_Z();
+                std::string z = std::to_string(db);
+                bot->getApi().sendMessage(message->chat->id, "Current SPL around my HAT is: " + z + "dB SPL Z");
+            }
+            else{
+                bot->getApi().sendMessage(message->chat->id, "Sorry, i don't know '" + message->text + "'.");
+            }
+        });
+
+        try {
+            printf("Bot username: %s\n", bot->getApi().getMe()->username.c_str());
+            TgBot::TgLongPoll longPoll(*bot);
+            while (t_flag == botSend) {
+                printf("Long poll started\n");
+                longPoll.start();
+            }
+        } catch (TgBot::TgException& e) {
+            printf("error: %s\n", e.what());
+        }      
+    }
+    delete bot;
+    pthread_exit(NULL);
+}
+
+
+void* mqtt_state_audio(void* arg){
+    HAT_audio* pObj = (HAT_audio*) arg;
+
+
+    mqtt_publisher* myPub = new mqtt_publisher(CHANNEL_ID, MQTT_TOPIC, MQTT_HOST, MQTT_PORT);
+
+    while(t_flag == mqttPublish){
+      
+        int32_t db = pObj->calc_dB_SPL_Z();
+        std::string s = std::to_string(db);
+        char* pc = &s[0];
+        myPub->send_message(pc);
+        delay(15000);
+    }
+    delete myPub;
+    pthread_exit(NULL);
 }
