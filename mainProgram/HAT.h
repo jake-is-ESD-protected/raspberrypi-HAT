@@ -17,22 +17,21 @@ guide:
 #include <string>
 #include <mosquittopp.h>
 #include <pthread.h>
+#include <pigpio.h>
 
 #define BOT_TOKEN           "1806971019:AAHZ7TsycZH6Z402hfbYwqqDHuiEPaEGvhA"
 
 #define LED_RED_PIN         5
 #define LED_GREEN_PIN       6
 #define LED_BLUE_PIN        27
-#define THERMO_BUTTON_PIN   4
-#define AUDIO_BUTTON_PIN    7
+#define THERMO_BUTTON_PIN   23
+#define AUDIO_BUTTON_PIN    4
 
 #define GPIO_HIGH           HIGH
 #define GPIO_LOW            LOW
 
 //constants for thingsspeak
-#define CHANNEL_ID          (const char*)"ThermoID"
 #define MQTT_HOST           (const char*)"localhost"
-#define MQTT_TOPIC          (const char*)"thermo"
 #define MQTT_PORT           1883
 
 
@@ -99,6 +98,7 @@ enum flag{
 extern flag t_flag;
 
 enum sel_hat{
+    none,
     thermo,
     audio,
 };

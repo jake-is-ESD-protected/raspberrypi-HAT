@@ -4,6 +4,7 @@
 	date: 			May 28th, 2021
 	modified by: 	
 	notes:			set_flag_mutex should be defined as global variable
+                    enable SPI and disable 1-wire
 	guide:		    for more info, check out https://github.com/jake-is-ESD-protected/raspberrypi-HAT
 */
 
@@ -17,15 +18,16 @@ sel_hat hat_type;
 
 int main(void){
 
-    wiringPiSetup();
+    gpioInitialise();
+    gpioSetMode(THERMO_BUTTON_PIN, PI_INPUT);
+    gpioSetMode(AUDIO_BUTTON_PIN, PI_INPUT);
 
-    if(digitalRead(THERMO_BUTTON_PIN) == HIGH){
+    if(gpioRead(THERMO_BUTTON_PIN) == HIGH){
 
         printf("Thermo-HAT registered. Starting thermo-branch.\n");
         hat_type = thermo;
-
     }
-    if(digitalRead(AUDIO_BUTTON_PIN) == HIGH){
+    if(gpioRead(AUDIO_BUTTON_PIN) == HIGH){
 
         printf("Audio-HAT registered. Starting audio-branch.\n");
         hat_type = audio;
@@ -38,11 +40,9 @@ int main(void){
         if(pMainHAT_thermo->isClean() != 1){
             printf("Warning: init not clean, check above error.\n");
         }
-
-        pthread_create(&threads[2], NULL, thingspeakServer, NULL);
         pthread_create(&threads[1], NULL, pollForButton_thermo, pMainHAT_thermo);
         pthread_join(threads[1], NULL);
-        pthread_join(threads[2], NULL);
+        
     }
     else if(hat_type == audio){
         HAT_audio* pMainHAT_audio = new HAT_audio(SAMPLE_RATE, BIT_DEPTH, BUF_LEN, DEV_NAME);
@@ -55,6 +55,10 @@ int main(void){
     else{
         printf("unable to detect HAT\nexiting program...\n");
     }
+
+    pthread_create(&threads[2], NULL, thingspeakServer, NULL);
+    pthread_join(threads[2], NULL);
+
     pthread_exit(NULL);
     return 0;
 }

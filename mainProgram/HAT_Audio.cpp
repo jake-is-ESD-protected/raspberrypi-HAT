@@ -8,7 +8,6 @@
 */
 
 #include "HAT_Audio.h"
-#include <tgbot/tgbot.h>
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 
@@ -82,6 +81,21 @@ HAT_audio::HAT_audio(uint16_t x_sampleRate, uint8_t x_bitDepth, uint32_t x_bufle
     }
 
     init_rdy = true;
+
+       //happy to be ready!
+    printf("\n\n***************RaspberryPi audio-HAT by Stefan & Jakob is ready!***************\n\n");
+
+    for(int i = 0; i < 3; i++){
+        gpioWrite(LED_RED_PIN, GPIO_HIGH);
+        delay(200);
+        gpioWrite(LED_RED_PIN, GPIO_LOW);
+        gpioWrite(LED_BLUE_PIN, GPIO_HIGH);      
+        delay(200);
+        gpioWrite(LED_BLUE_PIN, GPIO_LOW);
+        gpioWrite(LED_GREEN_PIN, GPIO_HIGH);
+        delay(200);
+        gpioWrite(LED_GREEN_PIN, GPIO_LOW);
+    }    
 }
 
 /*reads single buffer from audio stream and stores it
@@ -276,9 +290,17 @@ void CreateWavHeader(uint8_t* header, int waveDataSize, int samplingRate, int bi
 void* pollForButton_audio(void* arg){
     HAT_audio* pObj = (HAT_audio*) arg;
     int i = 0;
+
+    while(1){
+        if(digitalRead(AUDIO_BUTTON_PIN)==LOW){
+            printf("in loop\n");
+            delay(1000);
+        }
+        
+    }
     while(1){
       
-        if(digitalRead(THERMO_BUTTON_PIN) == LOW){
+        if(digitalRead(AUDIO_BUTTON_PIN) == LOW){
 
             pthread_mutex_lock(&(set_flag_mutex));
             switch(i){
@@ -328,6 +350,8 @@ void* pollForButton_audio(void* arg){
             }
             pthread_mutex_unlock(&set_flag_mutex);
             while(digitalRead(AUDIO_BUTTON_PIN) == LOW);
+            delay(200);
+            setColor(dark);
             i++;         
             if(i > mqttPublish){
                 i = standby;
@@ -343,7 +367,7 @@ void* passiveSend_state_audio(void* arg){
     HAT_audio* pObj = (HAT_audio*) arg;
     while(t_flag == passiveSend){
         int32_t db = pObj->calc_dB_SPL_Z();
-        printf("sound pressure level (Z): %d", db);
+        printf("sound pressure level (Z): %d\n", db);
    }
    pthread_exit(NULL);
 }
@@ -399,7 +423,7 @@ void* mqtt_state_audio(void* arg){
     HAT_audio* pObj = (HAT_audio*) arg;
 
 
-    mqtt_publisher* myPub = new mqtt_publisher(CHANNEL_ID, MQTT_TOPIC, MQTT_HOST, MQTT_PORT);
+    mqtt_publisher* myPub = new mqtt_publisher(CHANNEL_AUDIO_ID, MQTT_AUDIO_TOPIC, MQTT_HOST, MQTT_PORT);
 
     while(t_flag == mqttPublish){
       

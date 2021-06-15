@@ -18,13 +18,13 @@ HAT::HAT(void){
    HAT_error = noError;
 
    //GPIO-Setup:
-   pinMode(LED_BLUE_PIN, OUTPUT);
-   pinMode(LED_GREEN_PIN, OUTPUT);
-  	pinMode(LED_RED_PIN, OUTPUT);
+   gpioSetMode(LED_BLUE_PIN, PI_OUTPUT);
+   gpioSetMode(LED_GREEN_PIN, PI_OUTPUT);
+  	gpioSetMode(LED_RED_PIN, PI_OUTPUT);
 
-   digitalWrite (LED_RED_PIN, GPIO_HIGH);
-   digitalWrite (LED_GREEN_PIN, GPIO_LOW);
-   digitalWrite (LED_BLUE_PIN, GPIO_LOW);
+   gpioWrite (LED_RED_PIN, GPIO_HIGH);
+   gpioWrite (LED_GREEN_PIN, GPIO_LOW);
+   gpioWrite (LED_BLUE_PIN, GPIO_LOW);
    printf("Starting HAT...\n\n");
 }
 
@@ -73,44 +73,44 @@ uint8_t HAT::isClean(void){
 void setColor(uint8_t color){
    switch(color){
       case white:
-         digitalWrite(LED_RED_PIN, HIGH);
-         digitalWrite(LED_GREEN_PIN, HIGH);
-         digitalWrite(LED_BLUE_PIN, HIGH);
+         gpioWrite(LED_RED_PIN, HIGH);
+         gpioWrite(LED_GREEN_PIN, HIGH);
+         gpioWrite(LED_BLUE_PIN, HIGH);
          break;
       case red:
-         digitalWrite(LED_RED_PIN, HIGH);
-         digitalWrite(LED_GREEN_PIN, LOW);
-         digitalWrite(LED_BLUE_PIN, LOW);
+         gpioWrite(LED_RED_PIN, HIGH);
+         gpioWrite(LED_GREEN_PIN, LOW);
+         gpioWrite(LED_BLUE_PIN, LOW);
          break;
       case green:   
-         digitalWrite(LED_RED_PIN, LOW);
-         digitalWrite(LED_GREEN_PIN, HIGH);
-         digitalWrite(LED_BLUE_PIN, LOW);
+         gpioWrite(LED_RED_PIN, LOW);
+         gpioWrite(LED_GREEN_PIN, HIGH);
+         gpioWrite(LED_BLUE_PIN, LOW);
          break;
       case blue:
-         digitalWrite(LED_RED_PIN, LOW);
-         digitalWrite(LED_GREEN_PIN, LOW);
-         digitalWrite(LED_BLUE_PIN, HIGH);
+         gpioWrite(LED_RED_PIN, LOW);
+         gpioWrite(LED_GREEN_PIN, LOW);
+         gpioWrite(LED_BLUE_PIN, HIGH);
          break;
       case yellow:
-         digitalWrite(LED_RED_PIN, HIGH);
-         digitalWrite(LED_GREEN_PIN, HIGH);
-         digitalWrite(LED_BLUE_PIN, LOW);
+         gpioWrite(LED_RED_PIN, HIGH);
+         gpioWrite(LED_GREEN_PIN, HIGH);
+         gpioWrite(LED_BLUE_PIN, LOW);
          break;
       case cyan:
-         digitalWrite(LED_RED_PIN, LOW);
-         digitalWrite(LED_GREEN_PIN, HIGH);
-         digitalWrite(LED_BLUE_PIN, HIGH);
+         gpioWrite(LED_RED_PIN, LOW);
+         gpioWrite(LED_GREEN_PIN, HIGH);
+         gpioWrite(LED_BLUE_PIN, HIGH);
          break;
       case purple:
-         digitalWrite(LED_RED_PIN, HIGH);
-         digitalWrite(LED_GREEN_PIN, LOW);
-         digitalWrite(LED_BLUE_PIN, HIGH);
+         gpioWrite(LED_RED_PIN, HIGH);
+         gpioWrite(LED_GREEN_PIN, LOW);
+         gpioWrite(LED_BLUE_PIN, HIGH);
          break;
       case dark:
-         digitalWrite(LED_RED_PIN, LOW);
-         digitalWrite(LED_GREEN_PIN, LOW);
-         digitalWrite(LED_BLUE_PIN, LOW);
+         gpioWrite(LED_RED_PIN, LOW);
+         gpioWrite(LED_GREEN_PIN, LOW);
+         gpioWrite(LED_BLUE_PIN, LOW);
          break;
       default:
          printf("color not implemented.\n");                                                   

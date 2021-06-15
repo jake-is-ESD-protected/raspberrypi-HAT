@@ -42,15 +42,15 @@ HAT_thermo::HAT_thermo(){
    printf("\n\n***************RaspberryPi temperature-HAT by Stefan & Jakob is ready!***************\n\n");
 
    for(int i = 0; i < 3; i++){
-      digitalWrite(LED_RED_PIN, GPIO_HIGH);
+      gpioWrite(LED_RED_PIN, GPIO_HIGH);
       delay(200);
-      digitalWrite(LED_RED_PIN, GPIO_LOW);
-      digitalWrite(LED_BLUE_PIN, GPIO_HIGH);      
+      gpioWrite(LED_RED_PIN, GPIO_LOW);
+      gpioWrite(LED_BLUE_PIN, GPIO_HIGH);      
       delay(200);
-      digitalWrite(LED_BLUE_PIN, GPIO_LOW);
-      digitalWrite(LED_GREEN_PIN, GPIO_HIGH);
+      gpioWrite(LED_BLUE_PIN, GPIO_LOW);
+      gpioWrite(LED_GREEN_PIN, GPIO_HIGH);
       delay(200);
-      digitalWrite(LED_GREEN_PIN, GPIO_LOW);
+      gpioWrite(LED_GREEN_PIN, GPIO_LOW);
    }
 }
 
@@ -204,8 +204,6 @@ void* pollForButton_thermo(void* arg){
                printf("mqtt-mode\n");
                pthread_t t_mqtt[1];
                pthread_create(&t_mqtt[1], NULL, mqtt_state_thermo, arg);
-               delay(100);
-               setColor(dark);
                break;
 
             default:
@@ -213,6 +211,8 @@ void* pollForButton_thermo(void* arg){
          }
          pthread_mutex_unlock(&set_flag_mutex);
          while(digitalRead(THERMO_BUTTON_PIN) == LOW);
+         delay(200);
+         setColor(dark);
          i++;         
          if(i > mqttPublish){
             i = standby;

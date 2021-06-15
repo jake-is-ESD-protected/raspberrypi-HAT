@@ -1,4 +1,5 @@
 import thingspeak
+import RPi.GPIO as GPIO
 import time
 import paho.mqtt.client as mqtt
  
@@ -11,6 +12,29 @@ mqttHost = "mqtt.thingspeak.com"    # subscriber on thingsspeak which displays d
 topic = "thermo"                    # topic to which the client subscribe and gets data
 tPort = 1883                        # port for thingspeak
 qos = 0
+
+
+# pin numbers to check whick HAT is connected to the Raspberry Pi
+thermoButtonPin = 23
+audioButtonPin = 4
+thermo = 1
+audio = 2
+
+# check if BCM (call with GPIO numbers) or call with board numbers
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(thermoButtonPin, GPIO.IN)
+GPIO.setup(audioButtonPin, GPIO.IN)
+
+
+if GPIO.input(thermoButtonPin) == True:
+    print("Thermo-HAT registered. Starting thermo-branch in python.")
+    hatType = thermo
+elif GPIO.input(audioButtonPin) == True:
+    print("Audio-HAT registered. Starting audio-branch in python.")
+    hatType = audio
+else:
+    print("No HAT detected!")
+
 
 # variable to communicate with the thingspeak channel using the thingspeak channel IDs
 channel = thingspeak.Channel(id=channel_id, write_key=write_key, api_key=read_key)
@@ -57,9 +81,12 @@ client.connect(broker, tPort, 60)
 client.loop_forever()
 
  
+# only send data to thingspeak if the temperature HAT is connected
 if __name__ == "__main__":
-    print("started pthon script")
-    while True:
-        measure(channel, msg)
-        # free thingspeak account has an api limit of 15sec
-        time.sleep(20)
+    if hatType == thermo:
+        while True:
+            measure(channel, msg)
+            # free thingspeak account has an api limit of 15sec
+            time.sleep(20)
+    else:
+        print("Wrong or no HAT connected. Useless to open thingspeak client")

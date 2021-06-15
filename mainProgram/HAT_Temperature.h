@@ -42,7 +42,10 @@ guide:			command-byte instructions:
 #define SPI_MODE            3
 #define CE_CHANNEL          0
 
-#define ROUGH_TEMP_OFFS     0
+#define ROUGH_TEMP_OFFS     8
+
+#define CHANNEL_ID          (const char*)"ThermoID"
+#define MQTT_TOPIC          (const char*)"thermo"
 
 
 class HAT_thermo : public HAT{

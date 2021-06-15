@@ -24,11 +24,14 @@ guide:
 #define BIT_DEPTH           32
 #define BUF_LEN             16384
 #define DBSPL_OFFS          94
-#define DEV_NAME            "plughw:1"
+#define DEV_NAME            "plughw:0"
 
 //GPIOs
 #define ROTARY_A            9
 #define ROTARY_B            8
+
+#define CHANNEL_AUDIO_ID    (const char*)"AudioID"
+#define MQTT_AUDIO_TOPIC    (const char*)"audio"
 
 class HAT_audio : public HAT{
 
