@@ -19,21 +19,22 @@ sel_hat hat_type;
 int main(void){
 
     gpioInitialise();
+
     gpioSetMode(THERMO_BUTTON_PIN, PI_INPUT);
     gpioSetMode(AUDIO_BUTTON_PIN, PI_INPUT);
 
     if(gpioRead(THERMO_BUTTON_PIN) == HIGH){
-
         printf("Thermo-HAT registered. Starting thermo-branch.\n");
         hat_type = thermo;
     }
-    if(gpioRead(AUDIO_BUTTON_PIN) == HIGH){
 
+    if(gpioRead(AUDIO_BUTTON_PIN) == HIGH){
         printf("Audio-HAT registered. Starting audio-branch.\n");
         hat_type = audio;
     }
 
     pthread_t threads[2];
+    pthread_create(&threads[2], NULL, thingspeakServer, NULL);
 
     if(hat_type == thermo){
         HAT_thermo* pMainHAT_thermo = new HAT_thermo();
@@ -49,16 +50,16 @@ int main(void){
         if(pMainHAT_audio->isClean() != 1){
             printf("Warning: init not clean, check above error.\n");
         }
+
         pthread_create(&threads[1], NULL, pollForButton_audio, pMainHAT_audio);
         pthread_join(threads[1], NULL);
     }
     else{
         printf("unable to detect HAT\nexiting program...\n");
+        return 0;
     }
 
-    pthread_create(&threads[2], NULL, thingspeakServer, NULL);
     pthread_join(threads[2], NULL);
-
     pthread_exit(NULL);
     return 0;
 }

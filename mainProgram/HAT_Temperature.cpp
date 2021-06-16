@@ -160,7 +160,7 @@ void* pollForButton_thermo(void* arg){
    int i = 0;
    while(1){
       
-      if(digitalRead(THERMO_BUTTON_PIN) == LOW){
+      if(gpioRead(THERMO_BUTTON_PIN) == LOW){
 
          pthread_mutex_lock(&(set_flag_mutex));
          switch(i){
@@ -210,7 +210,7 @@ void* pollForButton_thermo(void* arg){
                break;           
          }
          pthread_mutex_unlock(&set_flag_mutex);
-         while(digitalRead(THERMO_BUTTON_PIN) == LOW);
+         while(gpioRead(THERMO_BUTTON_PIN) == LOW);
          delay(200);
          setColor(dark);
          i++;         
@@ -298,8 +298,12 @@ void* mqtt_state_thermo(void* arg){
    pthread_exit(NULL);
 }
 
+/*kickstart the server which acts as translator between mqtt and thingspeak
+   -gets started once at boot
+*/
 void* thingspeakServer(void* arg){
 
+   printf("starting python-server from c++ program\n");
    std::string filename = "/home/pi/workspace/HATlib/raspberrypi-HAT/mainProgram/mqttThingspeak.py";
    std::string command = "python ";
    command += filename;

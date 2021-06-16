@@ -1,7 +1,7 @@
 /*
 	auth:			Jakob Tschavoll
 	brief:			MEMS-mic sampling functions
-	date: 			May 20st, 2021
+	date: 			May 20th, 2021
 	modified by: 	Jakob Tschavoll
 	notes:			
 	guide:		    
@@ -25,6 +25,7 @@ HAT_audio::HAT_audio(uint16_t x_sampleRate, uint8_t x_bitDepth, uint32_t x_bufle
     sampler_err = 0;
     frames = (bufSize / (bitDepth / 8)) / 2;
     bufSizeSamples = frames * 2;
+    
 
     //open device
     fd = snd_pcm_open(&handle, devName, SND_PCM_STREAM_CAPTURE, 0);
@@ -111,8 +112,9 @@ uint8_t HAT_audio::readI2S(){
         sampler_err = 1;
         return sampler_err;
     }  
-
+    
     fd = snd_pcm_readi(handle, buffer, frames);
+    
     if (fd == -EPIPE) {
         /* EPIPE means overrun */
         fprintf(stderr, "overrun occurred\n");
@@ -128,7 +130,6 @@ uint8_t HAT_audio::readI2S(){
         return 1;
     }
     rdyBuffer = (int32_t*)(buffer);
-
     return 0;
 }
 
@@ -136,7 +137,10 @@ uint8_t HAT_audio::readI2S(){
 */
 int32_t HAT_audio::calc_dB_SPL_Z(){
 
-    if(rdyBuffer == NULL){
+    sampler_err = readI2S();
+    int32_t* pBuf = getBuf();
+    uint32_t size = getBufSize();
+    if(pBuf == NULL){
         sampler_err = 1;
         return sampler_err;
     }
@@ -145,8 +149,8 @@ int32_t HAT_audio::calc_dB_SPL_Z(){
     }
 
     double sum = 0;
-
-    for(int i = 0; i < bufSize; i++){
+    
+    for(int i = 0; i < size; i++){
         double sample = ((double)(rdyBuffer[i])) / ((double)INT32_MAX);
         sum += (sample * sample);
     }
@@ -209,10 +213,11 @@ HAT_audio::~HAT_audio(){
 */
 int32_t* HAT_audio::getBuf(){
 
-    return (int32_t*)buffer;
+    return rdyBuffer;
 }
 
 /*get buffer size in samples
+
 */
 uint32_t HAT_audio::getBufSize(){
 
@@ -290,17 +295,10 @@ void CreateWavHeader(uint8_t* header, int waveDataSize, int samplingRate, int bi
 void* pollForButton_audio(void* arg){
     HAT_audio* pObj = (HAT_audio*) arg;
     int i = 0;
-
-    while(1){
-        if(digitalRead(AUDIO_BUTTON_PIN)==LOW){
-            printf("in loop\n");
-            delay(1000);
-        }
         
-    }
     while(1){
       
-        if(digitalRead(AUDIO_BUTTON_PIN) == LOW){
+        if(gpioRead(AUDIO_BUTTON_PIN) == LOW){
 
             pthread_mutex_lock(&(set_flag_mutex));
             switch(i){
@@ -349,7 +347,7 @@ void* pollForButton_audio(void* arg){
                 break;           
             }
             pthread_mutex_unlock(&set_flag_mutex);
-            while(digitalRead(AUDIO_BUTTON_PIN) == LOW);
+            while(gpioRead(AUDIO_BUTTON_PIN) == LOW);
             delay(200);
             setColor(dark);
             i++;         
@@ -418,7 +416,9 @@ void* botSend_state_audio(void* arg){
     pthread_exit(NULL);
 }
 
-
+/*create a mqtt publisher to send data to (host is local)
+   -starts a mqtt publisher-client
+*/
 void* mqtt_state_audio(void* arg){
     HAT_audio* pObj = (HAT_audio*) arg;
 

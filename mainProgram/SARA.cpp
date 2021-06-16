@@ -7,22 +7,10 @@
 	guide:		    THIS IS DEPRICATED AND NO LONGER PART OF THE MAIN PROGRAM.
 */
 
-//g++ -o SARA SARA.cpp -lwiringPi
-//./SARA
-
-/*send command to SARA and get printed answers
-   -opens serial
-*/
+//g++ -o SARA SARA.cpp -lwiringPi -lpigpio
+//sudo ./SARA
 
 #include "SARA.h"
-#include "wiringPi.h"
-#include "stdio.h"
-#include <wiringSerial.h>
-
-#define PORT			    "/dev/ttyAMA0"
-#define BAUDRATE		    115200
-#define PWRON_PIN 		    2
-#define RESET_N_PIN 	    3
 
 bool pokeSARA(const char* message){
 
@@ -64,50 +52,41 @@ bool pokeSARA(const char* message){
 
 void saraSetupScript(void){
 
-    pokeSARA("AT+CGMM\r");
-    delay(2000);
-    printf("DEBUG\n");
-    pokeSARA("AT+UMNOPROF?\r");
-    delay(1000);
-    pokeSARA("AT+GMR\r");
-    delay(1000);
-    pokeSARA("AT+CIND?\r");
-    delay(1000);
-    pokeSARA("AT+CFUN?\r");
-    delay(1000);	
     pokeSARA("AT+COPS?\r");
-    delay(1000);
-    pokeSARA("AT+UGPIOC=16,10\r");
-    delay(1000);
-    pokeSARA("AT+UMNOPROF?\r");
-    delay(1000);
-    pokeSARA("AT+COPS=2\r");
-    delay(1000);	
-    pokeSARA("AT+COPS?\r");
-    delay(1000);
+	delay(1000);
+    pokeSARA("AT+CGMI\r");
+	delay(1000);
+    pokeSARA("AT+CPSMS=0\r");
+	delay(1000);
+    pokeSARA("AT+UMNOPROF=0,1\r");
+	delay(1000);	
+	pokeSARA("AT+CEREG=1\r");
+	delay(1000);
+	pokeSARA("AT+CSCON=1\r");
+	delay(1000);	
+	pokeSARA("AT+COPS=1,2,\"23203\",9\r");
+    printf("reboot to log into magenta, takes 3 minutes...\n");
+	delay(200000);
+	pokeSARA("AT+CGPADDR=1\r");
+	delay(1000);
     pokeSARA("AT+CIND?\r");
-    delay(1000);
-    pokeSARA("AT+UBANDMASK=0,524293\r");
-    delay(1000);
-    pokeSARA("AT+CIND?\r");
-    delay(1000);    
+	delay(1000);
 }
 
 //this is a replacement for larger algorithm in the main program
 int main(void){
 
-    wiringPiSetup();
+    gpioInitialise();
+	gpioSetMode(PWRON_PIN, PI_OUTPUT);
+	gpioSetMode(RESET_N_PIN, PI_OUTPUT);
 
-    pinMode(PWRON_PIN, OUTPUT);
-	pinMode(RESET_N_PIN, OUTPUT);
-
-	digitalWrite (PWRON_PIN, LOW);
+    printf("booting SARA...\n\n");
+	gpioWrite (PWRON_PIN, LOW);
     delay(2000);
-    digitalWrite(PWRON_PIN, HIGH);
+    gpioWrite(PWRON_PIN, HIGH);
     delay(2000);
-    digitalWrite (PWRON_PIN, LOW);
-    printf("SARA booting (5s)...\n");
-    delay(5000);
+    gpioWrite (PWRON_PIN, LOW);
+    delay(2000);
 
     saraSetupScript();
 

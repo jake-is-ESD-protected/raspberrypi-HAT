@@ -10,13 +10,13 @@
 //g++ -o test_i2s_audio -lasound -lfftw3 -lm test_i2s_audio.cpp
 //./test_i2s_audio
 
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Audio.h"
-#include "/home/pi/workspace/HATlib/raspberrypi-HAT/HAT_Audio.cpp"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/mainProgram/HAT_Audio.h"
+#include "/home/pi/workspace/HATlib/raspberrypi-HAT/mainProgram/HAT_Audio.cpp"
 
 
 int main(){
 
-    sampler* pMainSampler = new sampler(SAMPLE_RATE, BIT_DEPTH, BUF_LEN, DEV_NAME);
+    HAT_audio* pMainSampler = new HAT_audio(SAMPLE_RATE, BIT_DEPTH, BUF_LEN, DEV_NAME);
 
     for(int i = 0; i < 100; i++){
         uint8_t fd = pMainSampler->readI2S();

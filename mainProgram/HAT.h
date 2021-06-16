@@ -21,9 +21,9 @@ guide:
 
 #define BOT_TOKEN           "1806971019:AAHZ7TsycZH6Z402hfbYwqqDHuiEPaEGvhA"
 
-#define LED_RED_PIN         5
-#define LED_GREEN_PIN       6
-#define LED_BLUE_PIN        27
+#define LED_RED_PIN         24
+#define LED_GREEN_PIN       25
+#define LED_BLUE_PIN        16
 #define THERMO_BUTTON_PIN   23
 #define AUDIO_BUTTON_PIN    4
 

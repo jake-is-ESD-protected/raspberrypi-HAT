@@ -17,6 +17,7 @@ guide:			command-byte instructions:
 #include <wiringPiSPI.h>
 #include <wiringSerial.h>
 #include <wiringPi.h>
+#include <pigpio.h>
 #include <inttypes.h>
 
 //register adress of ADT7310
@@ -42,12 +43,12 @@ guide:			command-byte instructions:
 //peripheral defines
 #define PORT			"/dev/ttyAMA0"
 #define BAUDRATE		115200
-#define PWRON_PIN 		2
-#define RESET_N_PIN 	3
+#define PWRON_PIN 		27
+#define RESET_N_PIN 	22
 #define SPI_CLOCK       50000
 #define SPI_MODE        3
 #define CE_CHANNEL      0
-#define LED_PIN         5
+#define LED_PIN         24
 #define ROUGH_TEMP_OFFS 10
 
 bool hat_init(void);

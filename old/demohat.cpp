@@ -5,7 +5,7 @@
 	modified by: 	Jakob Tschavoll
 	notes:			reading temperature consists of 3 bytes: command byte, 16bit value
 	guide:		   Make sure to enable SPI in Raspi-config
-                  To build use: g++ -o demohat demohat.cpp -lwiringPi
+                  To build use: g++ -o demohat demohat.cpp -lwiringPi -lpigpio
                   To run use: sudo ./demohat
 */
 #include "demohat.h"
@@ -41,7 +41,6 @@ bool hat_callSARA(const char* msg){
    else{
       for(int i = 0; i < receiveLen; i++){
          bufReceive[i] = serialGetchar(mySerial);
-          printf("%d\n", i);
          printf("%c", bufReceive[i]);
       }
       printf("\n");
@@ -57,68 +56,38 @@ bool hat_callSARA(const char* msg){
 int main(void){
 
    //peripheral setup
-   wiringPiSetup();
-  	pinMode(LED_PIN, OUTPUT);
-	pinMode(PWRON_PIN, OUTPUT);
-	pinMode(RESET_N_PIN, OUTPUT);
+   gpioInitialise();
+  	gpioSetMode(LED_PIN, OUTPUT);
+	gpioSetMode(PWRON_PIN, OUTPUT);
+	gpioSetMode(RESET_N_PIN, OUTPUT);
 
-   digitalWrite (LED_PIN, HIGH);
+   gpioWrite(LED_PIN, LOW);
    printf("Starting HAT...\n\n");
-	digitalWrite (PWRON_PIN, LOW);
+	gpioWrite (PWRON_PIN, LOW);
    delay(2000);
-   digitalWrite(PWRON_PIN, HIGH);
+   gpioWrite(PWRON_PIN, HIGH);
    delay(2000);
-   digitalWrite (PWRON_PIN, LOW);
-
-   //hat_callSARA("AT+UMNOPROF=0\r");
-
+   gpioWrite (PWRON_PIN, LOW);
    delay(2000);
-   hat_callSARA("AT+UMNOPROF?\r");
-	delay(1000);
-   
-   // printf("SARA booting (15s)...\n");
-   // delay(30000);
 
-   //error check
-   // printf("\nInitializing...\n\n");
-
-   //happy to be ready!
-   // for(int i = 0; i < 5; i++){
-   //    digitalWrite(LED_PIN, LOW);
-   //    delay(100);
-   //    digitalWrite(LED_PIN, HIGH);
-   //    delay(100);
-   // }
-
-   hat_callSARA("AT+CGMM\r");
+   hat_callSARA("AT+COPS?\r");
 	delay(1000);
-   hat_callSARA("AT+UMNOPROF?\r");
+   hat_callSARA("AT+CGMI\r");
 	delay(1000);
-   hat_callSARA("AT+GMR\r");
+   hat_callSARA("AT+CPSMS=0\r");
+	delay(1000);
+   hat_callSARA("AT+UMNOPROF=0,1\r");
 	delay(1000);	
-	hat_callSARA("AT+CIND?\r");
+	hat_callSARA("AT+CEREG=1\r");
 	delay(1000);
-	hat_callSARA("AT+CFUN?\r");
+	hat_callSARA("AT+CSCON=1\r");
 	delay(1000);	
-	hat_callSARA("AT+COPS?\r");
-	delay(1000);
-	hat_callSARA("AT+UGPIOC=16,10\r");
-	delay(1000);
-   hat_callSARA("AT+UMNOPROF?\r");
-	delay(1000);
-   hat_callSARA("AT+COPS=2\r");
-	delay(1000);	
-	hat_callSARA("AT+COPS?\r");
+	hat_callSARA("AT+COPS=1,2,\"23203\",9\r");
+	delay(200000);
+	hat_callSARA("AT+CGPADDR=1\r");
 	delay(1000);
    hat_callSARA("AT+CIND?\r");
-   delay(1000);
-   hat_callSARA("AT+UBANDMASK=0,524293\r");
-   delay(1000);
-   hat_callSARA("AT+CIND?\r");
-   delay(1000);     
-   // hat_callSARA("AT+CFUN=15\r");
-	// delay(15000);
-
+	delay(1000);
    return 0;
 }
 

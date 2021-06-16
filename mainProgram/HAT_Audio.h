@@ -24,7 +24,7 @@ guide:
 #define BIT_DEPTH           32
 #define BUF_LEN             16384
 #define DBSPL_OFFS          94
-#define DEV_NAME            "plughw:0"
+#define DEV_NAME            "plughw:1"
 
 //GPIOs
 #define ROTARY_A            9
@@ -75,6 +75,5 @@ void* pollForButton_audio(void* arg);
 void* passiveSend_state_audio(void* arg);
 void* botSend_state_audio(void* arg);
 void* mqtt_state_audio(void* arg);
-
 
 #endif
