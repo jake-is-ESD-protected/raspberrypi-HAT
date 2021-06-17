@@ -14,3 +14,4 @@ Each HAT has similar or unique states which can be cycled through by hardware co
  
  #Misc
  Check the "old" folder for basic functionalities like an audio-sampler with alsa, communication with ADT7310 or the ublox SARA-module. 
+![image](https://user-images.githubusercontent.com/78532991/122428439-2f429680-cf92-11eb-9cb8-06ff6c601d96.png)
