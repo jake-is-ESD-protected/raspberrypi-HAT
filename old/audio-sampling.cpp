@@ -10,7 +10,7 @@
 #define SAMPLE_RATE 44100
 #define BIT_DEPTH 32
 #define BIG_BUF_LEN 4096
-#define SAMPLE_TIME_IN_SEC_TESTPHASE 5
+#define SAMPLE_TIME_IN_SEC_TESTPHASE 20
 #define DBSPL_OFFS 94
 
 //Contains size-adjustable wav-header with padding
@@ -121,7 +121,6 @@ int main() {
     size = frames * 8; /* 4 bytes/, 2 channels */
     buffer = (char *) malloc(size);
     buffer_big = (int32_t*)malloc(BIG_BUF_LEN * sizeof(int32_t));
-    fprintf(stderr, "DEBUGGER: size = %d\n", size);
 
     snd_pcm_hw_params_get_period_time(params, &val, &dir);                          //We want to loop for 5 seconds
     loops = (SAMPLE_TIME_IN_SEC_TESTPHASE * 1000000) / val;

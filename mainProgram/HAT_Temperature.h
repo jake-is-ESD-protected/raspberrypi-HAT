@@ -15,7 +15,6 @@ guide:			command-byte instructions:
 //libs
 #include <stdio.h>
 #include <wiringPiSPI.h>
-#include <wiringPi.h>
 #include "HAT.h"
 
 //register adress of ADT7310
@@ -42,7 +41,7 @@ guide:			command-byte instructions:
 #define SPI_MODE            3
 #define CE_CHANNEL          0
 
-#define ROUGH_TEMP_OFFS     8
+#define ROUGH_TEMP_OFFS     0
 
 #define CHANNEL_ID          (const char*)"ThermoID"
 #define MQTT_TOPIC          (const char*)"thermo"

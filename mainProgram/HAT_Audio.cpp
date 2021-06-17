@@ -32,7 +32,6 @@ HAT_audio::HAT_audio(uint16_t x_sampleRate, uint8_t x_bitDepth, uint32_t x_bufle
     if (fd < 0) {
         fprintf(stderr, "unable to open pcm device: %s\n", snd_strerror(fd));
         sampler_err = 1;
-        ///TODO: impelemnt auto-selection of device
     }
 
     //set bit-depth
@@ -65,7 +64,7 @@ HAT_audio::HAT_audio(uint16_t x_sampleRate, uint8_t x_bitDepth, uint32_t x_bufle
     //snd_pcm_hw_params_get_period_size(params, &frames, &dir);                       //Use a buffer large enough to hold one period
 
     //alloc memory
-    buffer = (char *) malloc(bufSize);
+    buffer = (char *) calloc(bufSize, sizeof(char));
     if(buffer == NULL){
         fprintf(stderr, "unable to allocate memory for internal buffer\n");
         sampler_err = 1;
@@ -128,6 +127,9 @@ uint8_t HAT_audio::readI2S(){
     } else if (fd != (int)frames) {
         fprintf(stderr, "short read, read %d frames\n", fd);
         return 1;
+    }
+    for(int i = 0; i < BUF_LEN; i++){
+        printf("%d\n", (buffer[i]));
     }
     rdyBuffer = (int32_t*)(buffer);
     return 0;

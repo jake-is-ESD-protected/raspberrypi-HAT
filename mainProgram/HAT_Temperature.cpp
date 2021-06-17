@@ -253,7 +253,7 @@ void* botSend_state_thermo(void* arg){
          if (StringTools::startsWith(message->text, "/start")) {
             return;
          }
-         if(StringTools::startsWith(message->text, "/temp")){
+         if(StringTools::startsWith(message->text, "/thermo")){
             double temp = pObj->getTemp();
             std::string t = std::to_string(temp);
             bot->getApi().sendMessage(message->chat->id, "Current temperature on my HAT is: " + t + "°C");

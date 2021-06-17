@@ -46,7 +46,7 @@ private:
     snd_pcm_format_t bitDepthFlag;
     int dir;
     bool init_rdy = false;
-    char *buffer;
+    
     int bufSize;
     int bufSizeSamples;
     int32_t* rdyBuffer;
@@ -61,6 +61,7 @@ private:
     double bin;
 
 public:
+    char *buffer;
     HAT_audio(uint16_t x_sampleRate, uint8_t x_bitDepth, uint32_t x_buflen, const char *x_devName);
     ~HAT_audio();
     uint8_t readI2S();

@@ -25,10 +25,10 @@ HAT::HAT(void){
    gpioWrite (LED_RED_PIN, GPIO_HIGH);
    gpioWrite (LED_GREEN_PIN, GPIO_LOW);
    gpioWrite (LED_BLUE_PIN, GPIO_LOW);
-   printf("Starting HAT...\n\n");
 }
 
 /*destruct sara-object
+
 */
 HAT::~HAT(){
    HAT_error = noInit;

@@ -19,7 +19,6 @@ sel_hat hat_type;
 int main(void){
 
     gpioInitialise();
-
     gpioSetMode(THERMO_BUTTON_PIN, PI_INPUT);
     gpioSetMode(AUDIO_BUTTON_PIN, PI_INPUT);
 
@@ -35,6 +34,7 @@ int main(void){
 
     pthread_t threads[2];
     pthread_create(&threads[2], NULL, thingspeakServer, NULL);
+    delay(50);
 
     if(hat_type == thermo){
         HAT_thermo* pMainHAT_thermo = new HAT_thermo();
